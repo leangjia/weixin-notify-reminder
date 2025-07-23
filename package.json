@@ -1,0 +1,55 @@
+{
+  "name": "wechat-work-bot-scheduler",
+  "version": "1.0.0",
+  "description": "企业微信机器人定时提醒系统 - 基于Node.js的轻量级任务调度器",
+  "main": "reminder.js",
+  "scripts": {
+    "start": "node reminder.js",
+    "dev": "nodemon reminder.js",
+    "pm2": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop wechat-bot-scheduler",
+    "pm2:restart": "pm2 restart wechat-bot-scheduler",
+    "pm2:logs": "pm2 logs wechat-bot-scheduler"
+  },
+  "keywords": [
+    "wechat",
+    "wechat-work",
+    "enterprise-wechat",
+    "bot",
+    "scheduler",
+    "cron",
+    "reminder",
+    "notification",
+    "nodejs",
+    "express",
+    "task-scheduler"
+  ],
+  "author": "xintianyou <lifangchao668@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xintianyou/weixin-notify-reminder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xintianyou/weixin-notify-reminder/issues"
+  },
+  "homepage": "https://github.com/xintianyou/weixin-notify-reminder#readme",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "dotenv": "^17.2.0",
+    "express": "^4.18.2",
+    "node-cron": "^4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ]
+}

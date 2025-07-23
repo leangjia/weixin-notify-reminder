@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提醒任务管理器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+        }
+
+        .task-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .task-item h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .task-item p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .task-item .task-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .task-status.enabled {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .task-status.disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .task-actions button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+
+        .cron-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .mobile-input {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .mobile-input input {
+            flex: 1;
+        }
+
+        .mobile-input button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ 提醒任务管理器</h1>
+            <p>创建和管理您的个性化提醒任务</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>创建新任务</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskName">任务名称</label>
+                        <input type="text" id="taskName" placeholder="例如：喝水提醒" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskMessage">提醒内容</label>
+                        <textarea id="taskMessage" placeholder="例如：该起来喝水了" rows="3" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskCron">执行时间 (Cron表达式)</label>
+                        <input type="text" id="taskCron" placeholder="例如：0 9 * * * (每天9点)" required>
+                        <div class="cron-help">
+                            格式：秒 分 时 日 月 星期 | 
+                            <a href="https://www.bejson.com/othertools/cron/" target="_blank">Cron表达式生成器</a>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>提醒手机号</label>
+                        <div id="mobileNumbers">
+                            <div class="mobile-input">
+                                <input type="tel" placeholder="手机号" value="">
+                                <button type="button" onclick="removeMobile(this)" class="btn btn-danger">删除</button>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addMobile()" class="btn" style="margin-top: 5px;">添加手机号</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>有效日期</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day0" value="0">
+                                <label for="day0">周日</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day1" value="1" checked>
+                                <label for="day1">周一</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day2" value="2" checked>
+                                <label for="day2">周二</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day3" value="3" checked>
+                                <label for="day3">周三</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day4" value="4" checked>
+                                <label for="day4">周四</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day5" value="5" checked>
+                                <label for="day5">周五</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="day6" value="6">
+                                <label for="day6">周六</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        创建任务
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 id="taskListTitle">任务列表</h2>
+                <div class="form-group">
+                    <label for="phoneSearch">按手机号搜索</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="phoneSearch" placeholder="输入完整的手机号搜索任务" style="flex: 1;">
+                        <button type="button" class="btn" onclick="searchTasks()">搜索</button>
+                    </div>
+                </div>
+                <div id="taskList" class="task-list">
+                    <div class="empty-state">
+                        <p>请输入手机号进行搜索</p>
+                        <p>点击搜索按钮查看相关任务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // 显示任务列表
+        function displayTasks(tasks) {
+            const taskList = document.getElementById('taskList');
+            const taskListTitle = document.getElementById('taskListTitle');
+            const searchKeyword = document.getElementById('phoneSearch')?.value || '';
+            
+            // 更新任务列表标题
+            if (searchKeyword) {
+                const taskCount = tasks.length;
+                taskListTitle.textContent = `任务列表(搜索到${taskCount}个)`;
+            } else {
+                taskListTitle.textContent = `任务列表`;
+            }
+            
+            if (!searchKeyword || tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <p>${searchKeyword ? '未找到该手机号的任务' : '请输入手机号进行搜索'}</p>
+                        <p>${searchKeyword ? '请确认手机号是否正确' : '输入完整的手机号查看相关任务'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            taskList.innerHTML = tasks.map(task => `
+                <div class="task-item">
+                    <h3>${task.name}</h3>
+                    <p><strong>内容:</strong> ${task.message}</p>
+                    <p><strong>时间:</strong> ${task.cron}</p>
+                    <p><strong>时间描述:</strong> ${task.cronDescription || '无描述'}</p>
+                    <p><strong>手机号:</strong> ${task.mobileNumbers.join(', ')}</p>
+                    <p><strong>有效日期:</strong> ${task.activeDaysText || formatActiveDays(task.activeDays)}</p>
+                    <p><strong>创建时间:</strong> ${task.createdAtFormatted || task.createdAt}</p>
+                    <p><strong>状态:</strong> ${task.isActive ? '运行中' : '未运行'}</p>
+                    <span class="task-status ${task.enabled ? 'enabled' : 'disabled'}">
+                        ${task.enabled ? '已启用' : '已禁用'}
+                    </span>
+                    <div class="task-actions">
+                        <button class="btn ${task.enabled ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleTask('${task.id}', ${!task.enabled})">
+                            ${task.enabled ? '禁用' : '启用'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteTask('${task.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 搜索任务
+        async function searchTasks() {
+            const phone = document.getElementById('phoneSearch').value.trim();
+            
+            if (!phone) {
+                displayTasks([]);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tasks?phone=${encodeURIComponent(phone)}`);
+                const data = await response.json();
+                displayTasks(data.tasks || data);
+            } catch (error) {
+                console.error('搜索任务失败:', error);
+                displayTasks([]);
+            }
+        }
+
+        // 格式化有效日期
+        function formatActiveDays(days) {
+            if (!days || days.length === 0) return '每天';
+            if (days.length === 7) return '每天';
+            
+            const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return days.map(d => dayNames[d]).join(', ');
+        }
+
+        // 添加手机号输入框
+        function addMobile() {
+            const container = document.getElementById('mobileNumbers');
+            const div = document.createElement('div');
+            div.className = 'mobile-input';
+            div.innerHTML = `
+                <input type="tel" placeholder="手机号" required>
+                <button type="button" onclick="removeMobile(this)" class="btn btn-danger">删除</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 删除手机号输入框
+        function removeMobile(button) {
+            const container = document.getElementById('mobileNumbers');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // 创建任务
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('taskName').value;
+            const message = document.getElementById('taskMessage').value;
+            const cron = document.getElementById('taskCron').value;
+            
+            // 获取所有手机号
+            const mobileInputs = document.querySelectorAll('#mobileNumbers input');
+            const mobileNumbers = Array.from(mobileInputs)
+                .map(input => input.value.trim())
+                .filter(phone => phone);
+            
+            // 获取有效日期
+            const activeDays = [];
+            for (let i = 0; i <= 6; i++) {
+                const checkbox = document.getElementById(`day${i}`);
+                if (checkbox.checked) {
+                    activeDays.push(i);
+                }
+            }
+
+            const taskData = {
+                name,
+                message,
+                cron,
+                mobileNumbers,
+                activeDays,
+                enabled: true
+            };
+
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(taskData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('taskForm').reset();
+                    loadTasks();
+                    alert('任务创建成功！');
+                } else {
+                    const error = await response.json();
+                    alert('创建失败: ' + error.error);
+                }
+            } catch (error) {
+                console.error('创建任务失败:', error);
+                alert('创建任务失败，请重试');
+            }
+        });
+
+        // 切换任务状态
+        async function toggleTask(id, enabled) {
+            try {
+                const response = await fetch(`/api/tasks/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ enabled })
+                });
+
+                if (response.ok) {
+                    loadTasks();
+                }
+            } catch (error) {
+                console.error('切换任务状态失败:', error);
+            }
+        }
+
+        // 删除任务
+        async function deleteTask(id) {
+            if (!confirm('确定要删除这个任务吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/tasks/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadTasks();
+                }
+            } catch (error) {
+                console.error('删除任务失败:', error);
+            }
+        }
+
+    </script>
+</body>
+</html>
