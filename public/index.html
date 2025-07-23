@@ -503,6 +503,16 @@
             }
         }
 
+        // 加载任务列表（用于刷新）
+        async function loadTasks() {
+            const phone = document.getElementById('phoneSearch').value.trim();
+            if (phone) {
+                await searchTasks();
+            } else {
+                displayTasks([]);
+            }
+        }
+
     </script>
 </body>
 </html>
