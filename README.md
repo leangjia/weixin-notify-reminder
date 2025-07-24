@@ -218,6 +218,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <img src="./static/msg0.png" width="300px">
 <img src="./static/msg1.png" width="300px">
+<img src="./static/pic1.png">
+<img src="./static/pic2.png">
+<img src="./static/pic3.png">
 
 > “私人助理”是企业微信账号的企业名称
 
