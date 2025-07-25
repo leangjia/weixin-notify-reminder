@@ -456,7 +456,7 @@
                 if (response.ok) {
                     document.getElementById('taskForm').reset();
                     loadTasks();
-                    alert('任务创建成功！');
+                    alert('任务创建成功！记得把想要提醒的Ta加入到群聊哦~');
                 } else {
                     const error = await response.json();
                     alert('创建失败: ' + error.error);
