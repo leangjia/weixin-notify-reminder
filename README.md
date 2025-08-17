@@ -1,3 +1,15 @@
+========================================================
+增加：dokcer 容器化部署：
+#!/bin/bash
+git clone https://github.com/xintianyou/weixin-notify-reminder
+cd wechat-work-bot-scheduler
+mkdir config data
+cp .env.example config/.env
+# 编辑 config/.env 填写 webhook key
+nano config/.env
+docker-compose up -d
+echo "✅ 项目已启动，访问 http://服务器IP:3000"
+========================================================
 # WeChat Work Bot Scheduler
 
 [English](#english) | [中文](#中文)
