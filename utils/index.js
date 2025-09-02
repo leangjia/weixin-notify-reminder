@@ -3,6 +3,8 @@
  * 提供Cron表达式解析、日期格式化等通用功能
  */
 
+const { isValidCron } = require('cron-validator');
+
 /**
  * 解析Cron表达式为自然语言描述
  * @param {string} expression Cron表达式
@@ -136,8 +138,19 @@ function formatActiveDays(activeDays) {
   return activeDays.map(d => dayNames[d]).join(', ');
 }
 
+// 验证cron表达式是否合法
+function validateCron(expr) {
+  const parts = expr.trim().split(/\s+/);
+  if (parts.length === 5) {
+    return isValidCron(expr);
+  } else if (parts.length === 6) {
+    return isValidCron(expr, { seconds: true });
+  }
+  return false;
+}
 
 module.exports = {
   parseCronExpression,
   formatActiveDays,
+  validateCron,
 };

@@ -6,7 +6,7 @@ const path = require("path");
 const express = require("express");
 
 // 导入工具函数
-const { parseCronExpression, formatActiveDays } = require('./utils/index.js');
+const { parseCronExpression, formatActiveDays, validateCron } = require('./utils/index.js');
 
 // 配置参数（可在 PM2 环境变量中覆盖）
 const WECHAT_WEBHOOK_URL = process.env.WECHAT_WEBHOOK_URL || "https://qyapi.weixin.qq.com/cgi-bin/webhook/send";
@@ -216,6 +216,10 @@ app.post("/api/tasks", (req, res) => {
   
   if (!name || !message || !cron) {
     return res.status(400).json({ error: "缺少必要参数" });
+  }
+
+  if (!validateCron(cron)) {
+    return res.status(400).json({ error: "cron表达式无效" });
   }
 
   const tasks = loadTasks();
