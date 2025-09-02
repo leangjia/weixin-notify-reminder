@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  wechat-bot:
+    build:
+      context: .
+    image: wechat-work-bot-scheduler:latest
+    container_name: wechat-bot-scheduler
+    ports:
+      - "3000:3000"
+    environment:
+      - WECHAT_WEBHOOK_KEY=${WECHAT_WEBHOOK_KEY}
+      - TZ=Asia/Shanghai
+      - PORT=3000
+    volumes:
+      # 挂载 .env 文件（外部配置）
+      - ./config/.env:/app/.env
+      # 持久化 tasks.json，重启不丢失任务
+      - ./data/tasks.json:/app/tasks.json
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
