@@ -102,7 +102,7 @@ function getLogsByTaskName(taskName, pageNo = 1, pageSize = 20) {
   
   return {
     logs: pagination(pageNo, pageSize, filteredLogs),
-    total: logs.length
+    total: filteredLogs.length
   };
 }
 
