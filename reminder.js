@@ -381,6 +381,8 @@ app.get("/api/logs", (req, res) => {
   try {
     const { keyword, pageNo = 1, pageSize = 20 } = req.query;
 
+    console.log('[ 获取日志 query ] >', req.query)
+
     if (!keyword) {
       return res.status(400).json({ 
         error: '缺少必要参数',
