@@ -386,7 +386,7 @@ app.get("/api/logs", (req, res) => {
     if (!keyword) {
       return res.status(400).json({ 
         error: '缺少必要参数',
-        message: '请根据手机号或任务名称查询',
+        message: '请根据手机号查询',
         timestamp: new Date().toISOString()
       });
     }
@@ -395,9 +395,9 @@ app.get("/api/logs", (req, res) => {
     const { getLogsByPhone, getLogsByTaskName } = require('./logger.js');
     
     let result = getLogsByPhone(keyword, parseInt(pageNo), parseInt(pageSize));
-    if (!result?.logs.length) {
-      result = getLogsByTaskName(keyword, parseInt(pageNo), parseInt(pageSize));
-    }
+    // if (!result?.logs.length) {
+    //   result = getLogsByTaskName(keyword, parseInt(pageNo), parseInt(pageSize));
+    // }
     
     res.json({
       code: 200,
