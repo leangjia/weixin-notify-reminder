@@ -379,7 +379,7 @@ app.delete("/api/tasks/:id", (req, res) => {
 // 获取日志列表
 app.get("/api/logs", (req, res) => {
   try {
-    const { keyword, limit = 100, offset = 0 } = req.query;
+    const { keyword, pageNo = 1, pageSize = 20 } = req.query;
 
     if (!keyword) {
       return res.status(400).json({ 
@@ -390,18 +390,12 @@ app.get("/api/logs", (req, res) => {
     }
     
     // 导入日志函数
-    const { getLogsByPhone, getLogsByTaskName, getAllLogs } = require('./logger.js');
+    const { getLogsByPhone, getLogsByTaskName } = require('./logger.js');
     
-    let result = {};
-    
-    let logs = getLogsByPhone(keyword, parseInt(limit));
-    if (!logs.length) {
-      logs = getLogsByTaskName(keyword, parseInt(limit));
+    let result = getLogsByPhone(keyword, parseInt(pageNo), parseInt(pageSize));
+    if (!result?.logs.length) {
+      result = getLogsByTaskName(keyword, parseInt(pageNo), parseInt(pageSize));
     }
-    result = {
-      logs,
-      total: logs.length,
-    };
     
     res.json({
       code: 200,

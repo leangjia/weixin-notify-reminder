@@ -67,48 +67,61 @@ function logOperation(taskName, mobileList, operation, message = '', details = {
   saveLogs(logs);
 }
 
+function pagination(pageNo = 1, pageSize = 10, dataList = []) {
+  if (pageNo < 1 || pageSize < 1) return [] // 非法参数直接返回空数组
+
+  const start = (pageNo - 1) * pageSize
+  const end = start + pageSize
+
+  return dataList.slice(start, end)
+}
+
 /**
  * 根据手机号获取日志
  */
-function getLogsByPhone(phone, limit = 100) {
+function getLogsByPhone(phone, pageNo = 1, pageSize = 20) {
   const logs = loadLogs();
   const filteredLogs = logs
     .filter(log => log.mobileList.includes(phone))
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .slice(0, limit);
   
-  return filteredLogs;
+  return {
+    logs: pagination(pageNo, pageSize, filteredLogs),
+    total: logs.length
+  };
 }
 
 /**
  * 根据任务名称获取日志
  */
-function getLogsByTaskName(taskName, limit = 100) {
+function getLogsByTaskName(taskName, pageNo = 1, pageSize = 20) {
   const logs = loadLogs();
   const filteredLogs = logs
     .filter(log => log.taskName === taskName)
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .slice(0, limit);
   
-  return filteredLogs;
+  return {
+    logs: pagination(pageNo, pageSize, filteredLogs),
+    total: logs.length
+  };
 }
 
 /**
  * 获取所有日志（支持分页）
  */
-function getAllLogs(offset = 0, limit = 100) {
-  const logs = loadLogs();
-  const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+// function getAllLogs(offset = 0, limit = 100) {
+//   const logs = loadLogs();
+//   const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   
-  return {
-    logs: sortedLogs.slice(offset, offset + limit),
-    total: sortedLogs.length
-  };
-}
+//   return {
+//     logs: sortedLogs.slice(offset, offset + limit),
+//     total: sortedLogs.length
+//   };
+// }
 
 module.exports = {
   logOperation,
   getLogsByPhone,
   getLogsByTaskName,
-  getAllLogs
+  // getAllLogs
 };
