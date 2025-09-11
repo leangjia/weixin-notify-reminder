@@ -289,6 +289,11 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="botUrl">自己的企业微信群机器人链接</label>
+                        <textarea id="botUrl" placeholder="你自己的群机器人链接，如果不填，就使用本平台自己的群机器人，不在群的无法收到信息" rows="3" required></textarea>
+                    </div>
+
                     <button type="submit" class="btn">
                         创建任务
                     </button>
@@ -435,12 +440,15 @@
                 }
             }
 
+            const botUrl = document.getElementById('botUrl').value;
+
             const taskData = {
                 name,
                 message,
                 cron,
                 mobileNumbers,
                 activeDays,
+                botUrl,
                 enabled: true
             };
 

@@ -34,6 +34,25 @@ let app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+async function testBotUrl(botUrl) {
+  try {
+    const response = await axios.post(botUrl, {
+      msgtype: "text",
+      text: {
+        content: '这是一条测试消息',
+      },
+    },
+    {
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000, // 5秒超时
+    });
+    const isSuccess = response.data.errcode === 0;
+    return isSuccess
+  } catch (error) {
+    return false
+  }
+}
+
 /**
  * 发送提醒的函数
  * @param {string} msg 提醒文字
@@ -42,7 +61,7 @@ app.use(express.static(path.join(__dirname, "public")));
  * @param {object} taskInfo 任务信息（可选，用于日志记录）
  * @returns 
  */
-async function reminder(msg, mobileList, premise = () => {}, taskInfo = null) {
+async function reminder(botUrl, msg, mobileList, premise = () => {}, taskInfo = null) {
   if (premise && !premise()) {
     return
   }
@@ -57,7 +76,7 @@ async function reminder(msg, mobileList, premise = () => {}, taskInfo = null) {
     console.log(`⏰ [${timestamp}] 发送提醒：${msg}；提醒手机号：${mobileList.join('、')}`);
 
     const response = await axios.post(
-      WEBHOOK_URL,
+      botUrl,
       {
         msgtype: "text",
         text: {
@@ -145,14 +164,15 @@ function scheduleTask(task) {
   }
 
   const job = cron.schedule(task.cron, async () => {
-    await reminder(task.message, task.mobileNumbers, () => {
+    const isExec = () => {
       if (task.activeDays && task.activeDays.length > 0) {
         const today = new Date().getDay();
         const dayMap = [0, 1, 2, 3, 4, 5, 6]; // Sunday to Saturday
         return task.activeDays.includes(dayMap[today]);
       }
       return true;
-    }, task); // 传递task信息用于日志记录
+    }
+    await reminder(task.botUrl, task.message, task.mobileNumbers, isExec, task); // 传递task信息用于日志记录
   });
 
   scheduledTasks.set(task.id, job);
@@ -247,8 +267,8 @@ app.get("/api/tasks", (req, res) => {
 
 
 // 创建任务
-app.post("/api/tasks", (req, res) => {
-  const { name, message, cron, mobileNumbers, activeDays, enabled = true } = req.body;
+app.post("/api/tasks", async (req, res) => {
+  const { name, message, cron, mobileNumbers, activeDays, enabled = true, botUrl } = req.body;
   
   if (!name || !message || !cron) {
     return res.status(400).json({ error: "缺少必要参数" });
@@ -256,6 +276,13 @@ app.post("/api/tasks", (req, res) => {
 
   if (!validateCron(cron)) {
     return res.status(400).json({ error: "cron表达式无效" });
+  }
+
+  if (botUrl) {
+    const testRes = await testBotUrl(botUrl)
+    if (!testRes) {
+      return res.status(400).json({ error: "您的机器人链接测试失败，请检查" });
+    }
   }
 
   const tasks = loadTasks();
@@ -267,6 +294,7 @@ app.post("/api/tasks", (req, res) => {
     mobileNumbers: mobileNumbers || [],
     activeDays: activeDays || [],
     enabled,
+    botUrl,
     createdAt: new Date().toISOString()
   };
 
