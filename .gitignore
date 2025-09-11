@@ -97,4 +97,5 @@ Thumbs.db
 
 # Application specific
 tasks.json
+logs.json
 EOF < /dev/null

@@ -7,6 +7,8 @@ const express = require("express");
 
 // 导入工具函数
 const { parseCronExpression, formatActiveDays, validateCron } = require('./utils/index.js');
+// 导入日志模块
+const { logOperation } = require('./logger.js');
 
 // 配置参数（可在 PM2 环境变量中覆盖）
 const WECHAT_WEBHOOK_URL = process.env.WECHAT_WEBHOOK_URL || "https://qyapi.weixin.qq.com/cgi-bin/webhook/send";
@@ -37,9 +39,10 @@ app.use(express.static(path.join(__dirname, "public")));
  * @param {string} msg 提醒文字
  * @param {array} mobileList 提醒手机号
  * @param {function} premise 自定义前提条件 函数执行结果为false将终止提醒
+ * @param {object} taskInfo 任务信息（可选，用于日志记录）
  * @returns 
  */
-async function reminder(msg, mobileList, premise = () => {}) {
+async function reminder(msg, mobileList, premise = () => {}, taskInfo = null) {
   if (premise && !premise()) {
     return
   }
@@ -68,15 +71,44 @@ async function reminder(msg, mobileList, premise = () => {}) {
       }
     );
 
+    const isSuccess = response.data.errcode === 0;
     console.log(
       "✅ 发送成功:",
-      response.data.errcode === 0 ? "成功" : response.data.errmsg
+      isSuccess ? "成功" : response.data.errmsg
     );
+    
+    // 记录发送成功日志
+    if (taskInfo) {
+      logOperation(
+        taskInfo.name,
+        mobileList,
+        'send_success',
+        msg,
+        {
+          taskId: taskInfo.id,
+          response: response.data
+        }
+      );
+    }
   } catch (error) {
     console.error(
       "❌ 发送失败:",
       error.response?.data?.errmsg || error.message
     );
+    
+    // 记录发送失败日志
+    if (taskInfo) {
+      logOperation(
+        taskInfo.name,
+        mobileList,
+        'send_failure',
+        msg,
+        {
+          taskId: taskInfo.id,
+          error: error.response?.data?.errmsg || error.message
+        }
+      );
+    }
   }
 }
 
@@ -120,7 +152,7 @@ function scheduleTask(task) {
         return task.activeDays.includes(dayMap[today]);
       }
       return true;
-    });
+    }, task); // 传递task信息用于日志记录
   });
 
   scheduledTasks.set(task.id, job);
@@ -240,6 +272,16 @@ app.post("/api/tasks", (req, res) => {
     if (enabled) {
       scheduleTask(newTask);
     }
+    logOperation(
+      newTask.name,
+      newTask.mobileNumbers,
+      'task_added',
+      newTask.message,
+      {
+        taskId: newTask.id,
+        cron: newTask.cron
+      }
+    );
     res.json(newTask);
   } else {
     res.status(500).json({ error: "保存任务失败" });
@@ -258,9 +300,25 @@ app.put("/api/tasks/:id", (req, res) => {
     return res.status(404).json({ error: "任务不存在" });
   }
 
+  const oldTask = { ...tasks[taskIndex] };
   tasks[taskIndex] = { ...tasks[taskIndex], ...updates, id };
   
   if (saveTasks(tasks)) {
+    // 记录任务启用/禁用日志
+    if (updates.hasOwnProperty('enabled') && oldTask.enabled !== updates.enabled) {
+      const operation = updates.enabled ? 'task_enabled' : 'task_disabled';
+      logOperation(
+        tasks[taskIndex].name,
+        tasks[taskIndex].mobileNumbers,
+        operation,
+        tasks[taskIndex].message,
+        {
+          taskId: id,
+          cron: tasks[taskIndex].cron
+        }
+      );
+    }
+    
     unscheduleTask(id);
     if (tasks[taskIndex].enabled) {
       scheduleTask(tasks[taskIndex]);
@@ -282,16 +340,73 @@ app.delete("/api/tasks/:id", (req, res) => {
     return res.status(404).json({ error: "任务不存在" });
   }
 
+  const task = tasks.find(t => t.id === id);
+
   if (saveTasks(filteredTasks)) {
     unscheduleTask(id);
+    logOperation(
+      task.name,
+      task.mobileNumbers,
+      'delete_task',
+      task.message,
+      {
+        taskId: task.id,
+        cron: task.cron
+      }
+    )
     res.json({ message: "任务已删除" });
   } else {
     res.status(500).json({ error: "删除任务失败" });
   }
 });
 
+// 获取日志列表
+app.get("/api/logs", (req, res) => {
+  try {
+    const { phone, taskName, limit = 100, offset = 0 } = req.query;
+    
+    // 导入日志函数
+    const { getLogsByPhone, getLogsByTaskName, getAllLogs } = require('./logger.js');
+    
+    let result;
+    
+    if (phone) {
+      // 根据手机号获取日志
+      const logs = getLogsByPhone(phone, parseInt(limit));
+      result = {
+        logs,
+        total: logs.length,
+        filter: { phone }
+      };
+    } else if (taskName) {
+      // 根据任务名称获取日志
+      const logs = getLogsByTaskName(taskName, parseInt(limit));
+      result = {
+        logs,
+        total: logs.length,
+        filter: { taskName }
+      };
+    } else {
+      // 获取所有日志（支持分页）
+      result = getAllLogs(parseInt(offset), parseInt(limit));
+    }
+    
+    res.json({
+      ...result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('获取日志失败:', error);
+    res.status(500).json({ 
+      error: '获取日志失败',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // 启动服务器
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 HTTP服务器启动在端口 ${PORT}`);
   console.log(`📱 访问 http://localhost:${PORT} 创建和管理提醒任务`);
 });
