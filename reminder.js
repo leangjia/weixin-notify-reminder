@@ -364,6 +364,14 @@ app.delete("/api/tasks/:id", (req, res) => {
 app.get("/api/logs", (req, res) => {
   try {
     const { phone, taskName, limit = 100, offset = 0 } = req.query;
+
+    if (!phone && !taskName) {
+      return res.status(400).json({ 
+        error: '缺少必要参数',
+        message: '请根据手机号或任务名称查询',
+        timestamp: new Date().toISOString()
+      });
+    }
     
     // 导入日志函数
     const { getLogsByPhone, getLogsByTaskName, getAllLogs } = require('./logger.js');
