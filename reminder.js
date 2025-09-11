@@ -379,9 +379,9 @@ app.delete("/api/tasks/:id", (req, res) => {
 // 获取日志列表
 app.get("/api/logs", (req, res) => {
   try {
-    const { phone, taskName, limit = 100, offset = 0 } = req.query;
+    const { keyword, limit = 100, offset = 0 } = req.query;
 
-    if (!phone && !taskName) {
+    if (!keyword) {
       return res.status(400).json({ 
         error: '缺少必要参数',
         message: '请根据手机号或任务名称查询',
@@ -392,28 +392,16 @@ app.get("/api/logs", (req, res) => {
     // 导入日志函数
     const { getLogsByPhone, getLogsByTaskName, getAllLogs } = require('./logger.js');
     
-    let result;
+    let result = {};
     
-    if (phone) {
-      // 根据手机号获取日志
-      const logs = getLogsByPhone(phone, parseInt(limit));
-      result = {
-        logs,
-        total: logs.length,
-        filter: { phone }
-      };
-    } else if (taskName) {
-      // 根据任务名称获取日志
-      const logs = getLogsByTaskName(taskName, parseInt(limit));
-      result = {
-        logs,
-        total: logs.length,
-        filter: { taskName }
-      };
-    } else {
-      // 获取所有日志（支持分页）
-      result = getAllLogs(parseInt(offset), parseInt(limit));
+    let logs = getLogsByPhone(keyword, parseInt(limit));
+    if (!logs.length) {
+      logs = getLogsByTaskName(keyword, parseInt(limit));
     }
+    result = {
+      logs,
+      total: logs.length,
+    };
     
     res.json({
       code: 200,
