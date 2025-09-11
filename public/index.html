@@ -376,7 +376,7 @@
             try {
                 const response = await fetch(`/api/tasks?phone=${encodeURIComponent(phone)}`);
                 const data = await response.json();
-                displayTasks(data.tasks || data);
+                displayTasks(data.data.tasks || data);
             } catch (error) {
                 console.error('搜索任务失败:', error);
                 displayTasks([]);
