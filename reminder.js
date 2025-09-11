@@ -187,7 +187,7 @@ app.get("/api/tasks", (req, res) => {
     
     // 验证手机号参数
     if (!phone) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: '缺少必要参数',
         message: '必须提供手机号参数',
         timestamp: new Date().toISOString()
@@ -226,10 +226,14 @@ app.get("/api/tasks", (req, res) => {
     });
 
     res.json({
-      tasks: enhancedTasks,
-      totalTasks: enhancedTasks.length,
-      phone: phone,
-      timestamp: new Date().toISOString()
+      code: 200,
+      message: 'success',
+      data: {
+        tasks: enhancedTasks,
+        totalTasks: enhancedTasks.length,
+        phone: phone,
+        timestamp: new Date().toISOString()
+      }
     });
   } catch (error) {
     console.error('获取任务列表失败:', error);
@@ -282,7 +286,11 @@ app.post("/api/tasks", (req, res) => {
         cron: newTask.cron
       }
     );
-    res.json(newTask);
+    res.json({
+      code: 200,
+      message: 'success',
+      data: newTask
+    });
   } else {
     res.status(500).json({ error: "保存任务失败" });
   }
@@ -323,7 +331,11 @@ app.put("/api/tasks/:id", (req, res) => {
     if (tasks[taskIndex].enabled) {
       scheduleTask(tasks[taskIndex]);
     }
-    res.json(tasks[taskIndex]);
+    res.json({
+      code: 200,
+      message: 'success',
+      data: tasks[taskIndex]
+    });
   } else {
     res.status(500).json({ error: "更新任务失败" });
   }
@@ -354,7 +366,11 @@ app.delete("/api/tasks/:id", (req, res) => {
         cron: task.cron
       }
     )
-    res.json({ message: "任务已删除" });
+    res.json({
+      code: 200,
+      message: 'success',
+      data: null
+    });
   } else {
     res.status(500).json({ error: "删除任务失败" });
   }
@@ -400,8 +416,12 @@ app.get("/api/logs", (req, res) => {
     }
     
     res.json({
-      ...result,
-      timestamp: new Date().toISOString()
+      code: 200,
+      message: 'success',
+      data: {
+        ...result,
+        timestamp: new Date().toISOString()
+      }
     });
   } catch (error) {
     console.error('获取日志失败:', error);
