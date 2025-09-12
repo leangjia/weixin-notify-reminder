@@ -76,7 +76,7 @@ async function reminder(botUrl, msg, mobileList, premise = () => {}, taskInfo = 
     console.log(`⏰ [${timestamp}] 发送提醒：${msg}；提醒手机号：${mobileList.join('、')}`);
 
     const response = await axios.post(
-      botUrl,
+      botUrl || WEBHOOK_URL,
       {
         msgtype: "text",
         text: {
