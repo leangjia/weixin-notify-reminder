@@ -34,6 +34,24 @@ let app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// 请求日志中间件 - 打印客户端IP和UA
+app.use((req, _res, next) => {
+  const clientIP = req.headers['x-forwarded-for'] || 
+                  req.headers['x-real-ip'] || 
+                  req.socket?.remoteAddress || 
+                  req.ip || 
+                  'Unknown';
+  const userAgent = req.headers['user-agent'] || 'Unknown';
+  const timestamp = new Date().toLocaleString('zh-CN', {
+    timeZone: TIME_ZONE,
+    hour12: false,
+  });
+  
+  console.log(`[${timestamp}] 📥 ${req.method} ${req.url} | IP: ${clientIP} | UA: ${userAgent}`);
+  
+  next();
+});
+
 async function testBotUrl(botUrl) {
   try {
     const response = await axios.post(botUrl, {
@@ -420,7 +438,7 @@ app.get("/api/logs", (req, res) => {
     }
     
     // 导入日志函数
-    const { getLogsByPhone, getLogsByTaskName } = require('./logger.js');
+    const { getLogsByPhone } = require('./logger.js');
     
     let result = getLogsByPhone(keyword, parseInt(pageNo), parseInt(pageSize));
     // if (!result?.logs.length) {
