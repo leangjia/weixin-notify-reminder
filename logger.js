@@ -79,10 +79,17 @@ function pagination(pageNo = 1, pageSize = 10, dataList = []) {
 /**
  * 根据手机号获取日志
  */
-function getLogsByPhone(phone, pageNo = 1, pageSize = 20) {
+function getLogsByPhone(phone, status, pageNo = 1, pageSize = 20) {
   const logs = loadLogs();
   const filteredLogs = logs
     .filter(log => log.mobileList.includes(phone))
+    .filter(log => {
+      if (status) {
+        return log.operation === status
+      } else {
+        return true
+      }
+    })
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
   
   return {

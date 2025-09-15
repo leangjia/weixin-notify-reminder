@@ -425,7 +425,7 @@ app.delete("/api/tasks/:id", (req, res) => {
 // 获取日志列表
 app.get("/api/logs", (req, res) => {
   try {
-    const { keyword, pageNo = 1, pageSize = 20 } = req.query;
+    const { keyword, status = '', pageNo = 1, pageSize = 20 } = req.query;
 
     console.log('[ 获取日志 query ] >', req.query)
 
@@ -440,7 +440,7 @@ app.get("/api/logs", (req, res) => {
     // 导入日志函数
     const { getLogsByPhone } = require('./logger.js');
     
-    let result = getLogsByPhone(keyword, parseInt(pageNo), parseInt(pageSize));
+    let result = getLogsByPhone(keyword, status, parseInt(pageNo), parseInt(pageSize));
     // if (!result?.logs.length) {
     //   result = getLogsByTaskName(keyword, parseInt(pageNo), parseInt(pageSize));
     // }
