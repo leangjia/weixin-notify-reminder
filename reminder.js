@@ -470,7 +470,7 @@ app.put("/api/logs/:id", (req, res) => {
   const logs = getAllLogs();
   const logIndex = logs.findIndex(log => log.id === id);
   
-  if (taskIndex === -1) {
+  if (logIndex === -1) {
     return res.status(404).json({ error: "日志不存在" });
   }
 
