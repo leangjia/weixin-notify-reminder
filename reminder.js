@@ -467,7 +467,7 @@ app.put("/api/logs/:id", (req, res) => {
   const { id } = req.params;
 
   try {
-    const { getAllLogs } = require('./logger.js');
+    const { getAllLogs, saveLogs } = require('./logger.js');
     const logs = getAllLogs();
     const logIndex = logs.findIndex(log => log.id === id);
     
@@ -480,6 +480,8 @@ app.put("/api/logs/:id", (req, res) => {
       isFinish: req.body.isFinish || false,
       id
     };
+
+    saveLogs(logs)
 
     res.json({
       code: 200,

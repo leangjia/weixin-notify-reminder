@@ -123,6 +123,7 @@ function getAllLogs() {
 }
 
 module.exports = {
+  saveLogs,
   logOperation,
   getLogsByPhone,
   getLogsByTaskName,
