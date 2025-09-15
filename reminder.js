@@ -466,25 +466,34 @@ app.get("/api/logs", (req, res) => {
 app.put("/api/logs/:id", (req, res) => {
   const { id } = req.params;
 
-  const { getAllLogs } = require('./logger.js');
-  const logs = getAllLogs();
-  const logIndex = logs.findIndex(log => log.id === id);
-  
-  if (logIndex === -1) {
-    return res.status(404).json({ error: "日志不存在" });
+  try {
+    const { getAllLogs } = require('./logger.js');
+    const logs = getAllLogs();
+    const logIndex = logs.findIndex(log => log.id === id);
+    
+    if (logIndex === -1) {
+      return res.status(404).json({ error: "日志不存在" });
+    }
+
+    logs[logIndex] = {
+      ...logs[logIndex],
+      isFinish: req.body.isFinish || false,
+      id
+    };
+
+    res.json({
+      code: 200,
+      message: 'success',
+      data: null
+    });
+  } catch (error) {
+    console.log('[ 更新完成状态失败 error ] >', error)
+    res.status(500).json({ 
+      error: '更新完成状态失败',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
-
-  logs[logIndex] = {
-    ...logs[logIndex],
-    isFinish: req.body.isFinish || false,
-    id
-  };
-
-  res.json({
-    code: 200,
-    message: 'success',
-    data: null
-  });
 })
 
 // 启动服务器
