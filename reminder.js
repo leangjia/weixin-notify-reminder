@@ -473,12 +473,18 @@ app.put("/api/logs/:id", (req, res) => {
   if (taskIndex === -1) {
     return res.status(404).json({ error: "日志不存在" });
   }
-  
+
   logs[logIndex] = {
     ...logs[logIndex],
     isFinish: req.body.isFinish || false,
     id
   };
+
+  res.json({
+    code: 200,
+    message: 'success',
+    data: null
+  });
 })
 
 // 启动服务器
