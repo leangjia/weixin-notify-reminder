@@ -50,6 +50,7 @@ function logOperation(taskName, mobileList, operation, message = '', details = {
     operation,
     message,
     details,
+    isFinish: false,
     timestamp: new Date().toISOString(),
     timestampFormatted: new Date().toLocaleString('zh-CN', {
       timeZone: process.env.TZ || 'Asia/Shanghai',
@@ -116,19 +117,14 @@ function getLogsByTaskName(taskName, pageNo = 1, pageSize = 20) {
 /**
  * 获取所有日志（支持分页）
  */
-// function getAllLogs(offset = 0, limit = 100) {
-//   const logs = loadLogs();
-//   const sortedLogs = logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  
-//   return {
-//     logs: sortedLogs.slice(offset, offset + limit),
-//     total: sortedLogs.length
-//   };
-// }
+function getAllLogs() {
+  const logs = loadLogs();
+  return logs;
+}
 
 module.exports = {
   logOperation,
   getLogsByPhone,
   getLogsByTaskName,
-  // getAllLogs
+  getAllLogs
 };

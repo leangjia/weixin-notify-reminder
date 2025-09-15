@@ -463,6 +463,24 @@ app.get("/api/logs", (req, res) => {
   }
 });
 
+app.put("/api/logs/:id", (req, res) => {
+  const { id } = req.params;
+
+  const { getAllLogs } = require('./logger.js');
+  const logs = getAllLogs();
+  const logIndex = logs.findIndex(log => log.id === id);
+  
+  if (taskIndex === -1) {
+    return res.status(404).json({ error: "日志不存在" });
+  }
+  
+  logs[logIndex] = {
+    ...logs[logIndex],
+    isFinish: req.body.isFinish || false,
+    id
+  };
+})
+
 // 启动服务器
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 HTTP服务器启动在端口 ${PORT}`);
