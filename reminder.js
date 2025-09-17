@@ -541,7 +541,11 @@ app.get("/api/statics", (req, res) => {
 
     // 发送成功的数量
     const sendSuccess = filteredLogs.filter(log => 
-      log.mobileList.includes(phone)
+      log.operation === 'send_success'
+    ).length;
+    // 发送失败的次数
+    const sendFailed = filteredLogs.filter(log => 
+      log.operation === 'send_failure'
     ).length;
     // 已完成的数量
     const finished = filteredLogs.filter(log => log.isFinish).length
@@ -553,6 +557,7 @@ app.get("/api/statics", (req, res) => {
         total: tasks.length,
         enabled: enabled.length,
         sendSuccess,
+        sendFailed,
         finished,
         dateRange: {
           start: start.toISOString(),
