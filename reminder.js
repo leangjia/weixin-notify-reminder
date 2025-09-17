@@ -463,6 +463,7 @@ app.get("/api/logs", (req, res) => {
   }
 });
 
+// 更新完成情况
 app.put("/api/logs/:id", (req, res) => {
   const { id } = req.params;
 
@@ -496,6 +497,75 @@ app.put("/api/logs/:id", (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
+})
+
+// 获取数据统计
+app.get("/api/statics", (req, res) => {
+  const { phone, startTime, endTime } = req.query
+  if (!phone) {
+    res.json({
+      code: 200,
+      message: 'success',
+      data: {
+        total: 0,
+        sendSuccess: 0,
+        finished: 0
+      }
+    });
+    return
+  }
+  try {
+    // 处理日期范围
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const start = startTime ? new Date(`${startTime} 00:00:00`) : today;
+    const end = endTime ? new Date(`${endTime} 23:59:59`) : new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
+    const allTasks = loadTasks()
+    const total = allTasks.filter(task => 
+      task.mobileNumbers.includes(phone)
+    ).length;
+
+    const { getAllLogs } = require('./logger.js');
+    const allLogs = getAllLogs();
+
+    // 根据日期范围和手机号过滤日志
+    const filteredLogs = allLogs.filter(log => {
+      const logDate = new Date(log.timestamp);
+      return logDate >= start && 
+             logDate < end && 
+             log.mobileList.includes(phone);
+    });
+
+    // 发送成功的数量
+    const sendSuccess = filteredLogs.filter(log => 
+      log.mobileList.includes(phone)
+    ).length;
+    // 已完成的数量
+    const finished = filteredLogs.filter(log => log.isFinish).length
+    
+    res.json({
+      code: 200,
+      message: 'success',
+      data: {
+        total,
+        sendSuccess,
+        finished,
+        dateRange: {
+          start: start.toISOString(),
+          end: end.toISOString()
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: '获取统计数据失败',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+
 })
 
 // 启动服务器
