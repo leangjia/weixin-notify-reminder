@@ -523,9 +523,10 @@ app.get("/api/statics", (req, res) => {
     const end = endTime ? new Date(`${endTime} 23:59:59`) : new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
     const allTasks = loadTasks()
-    const total = allTasks.filter(task => 
+    const tasks = allTasks.filter(task => 
       task.mobileNumbers.includes(phone)
-    ).length;
+    );
+    const enabled = tasks.filter(task => task.enabled)
 
     const { getAllLogs } = require('./logger.js');
     const allLogs = getAllLogs();
@@ -549,7 +550,8 @@ app.get("/api/statics", (req, res) => {
       code: 200,
       message: 'success',
       data: {
-        total,
+        total: tasks.length,
+        enabled: enabled.length,
         sendSuccess,
         finished,
         dateRange: {
