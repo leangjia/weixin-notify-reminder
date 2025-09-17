@@ -68,6 +68,23 @@ function logOperation(taskName, mobileList, operation, message = '', details = {
   saveLogs(logs);
 }
 
+/**
+ * 判断日志是否在指定日期
+ * @param {string} timestamp ISO格式的时间戳
+ * @param {string|Date} targetDate 目标日期
+ * @returns {boolean}
+ */
+function isLogInDate(timestamp, targetDate) {
+  if (!targetDate) return true;
+  
+  const logDate = new Date(timestamp);
+  const target = new Date(targetDate);
+  
+  return logDate.getFullYear() === target.getFullYear() &&
+         logDate.getMonth() === target.getMonth() &&
+         logDate.getDate() === target.getDate();
+}
+
 function pagination(pageNo = 1, pageSize = 10, dataList = []) {
   if (pageNo < 1 || pageSize < 1) return [] // 非法参数直接返回空数组
 
@@ -80,17 +97,17 @@ function pagination(pageNo = 1, pageSize = 10, dataList = []) {
 /**
  * 根据手机号获取日志
  */
-function getLogsByPhone(phone, status, pageNo = 1, pageSize = 20) {
+function getLogsByPhone(phone, status, date, pageNo = 1, pageSize = 20) {
   const logs = loadLogs();
   const filteredLogs = logs
     .filter(log => log.mobileList.includes(phone))
     .filter(log => {
       if (status) {
         return log.operation === status
-      } else {
-        return true
       }
+      return true
     })
+    .filter(log => isLogInDate(log.timestamp, date))
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
   
   return {
