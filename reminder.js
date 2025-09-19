@@ -47,7 +47,7 @@ app.use((req, _res, next) => {
     hour12: false,
   });
   
-  console.log(`[${timestamp}] 📥 ${req.method} ${req.url} | IP: ${clientIP} | UA: ${userAgent}`);
+  console.log(`[${timestamp}] 📥 ${req.method} body: ${req.url} ${JSON.stringify(req.body)} | IP: ${clientIP} | UA: ${userAgent}`);
   
   next();
 });
