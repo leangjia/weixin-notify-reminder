@@ -1,526 +1,1382 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>提醒任务管理器</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: auto;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
-        }
-
-        .task-list {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .task-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .task-item h3 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .task-item p {
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .task-item .task-status {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .task-status.enabled {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .task-status.disabled {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .task-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .task-actions button {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-        }
-
-        .cron-help {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .mobile-input {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-
-        .mobile-input input {
-            flex: 1;
-        }
-
-        .mobile-input button {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoHS环保报告管控系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    h1 { color: #333; margin-bottom: 20px; }
+    h2 { color: #333; margin: 15px 0 10px; font-size: 16px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 2px; }
+    .btn-primary { background: #1890ff; color: white; }
+    .btn-success { background: #52c41a; color: white; }
+    .btn-danger { background: #ff4d4f; color: white; }
+    .btn-default { background: #fff; border: 1px solid #d9d9d9; }
+    .btn-sm { padding: 4px 12px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-item { background: #fff; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 28px; font-weight: bold; color: #1890ff; }
+    .stat-label { color: #666; margin-top: 5px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    th { background: #fafafa; font-weight: 500; }
+    tr:hover { background: #fafafa; }
+    .status-tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .status-warning { background: #fffbe6; color: #faad14; }
+    .status-danger { background: #fff1f0; color: #ff4d4f; }
+    .status-normal { background: #f6ffed; color: #52c41a; }
+    .tabs { display: flex; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
+    .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { border-bottom-color: #1890ff; color: #1890ff; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 8px; width: 600px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 18px; margin-bottom: 20px; font-weight: 500; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #333; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #40a9ff; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+    .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .nav a { color: #666; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+    .nav a:hover { background: #e6f7ff; color: #1890ff; }
+    .nav a.active { background: #1890ff; color: white; }
+    .empty { text-align: center; padding: 40px; color: #999; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .toolbar-left { display: flex; gap: 10px; }
+    .search-input { padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 4px; width: 200px; }
+    .actions { display: flex; gap: 5px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 20px; }
+    .pagination button { padding: 4px 10px; }
+    .pagination span { padding: 4px 10px; color: #666; }
+    .pagination .current { background: #1890ff; color: white; border-radius: 4px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>⏰ 提醒任务管理器</h1>
-            <p>创建和管理您的个性化提醒任务</p>
-        </div>
+  <!-- 登录弹窗 -->
+  <div id="login-modal" class="modal show">
+    <div class="modal-content" style="width:350px;">
+      <div class="modal-title">用户登录</div>
+      <div class="form-group"><label>用户名</label><input type="text" id="login-username" placeholder="请输入用户名"></div>
+      <div class="form-group"><label>密码</label><input type="password" id="login-password" placeholder="请输入密码"></div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="doLogin()" style="width:100%;">登录</button></div>
+    </div>
+  </div>
 
-        <div class="main-content">
-            <div class="card">
-                <h2>创建新任务</h2>
-                <form id="taskForm">
-                    <div class="form-group">
-                        <label for="taskName">任务名称</label>
-                        <input type="text" id="taskName" placeholder="例如：喝水提醒" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="taskMessage">提醒内容</label>
-                        <textarea id="taskMessage" placeholder="例如：该起来喝水了" rows="3" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="taskCron">执行时间 (Cron表达式)</label>
-                        <input type="text" id="taskCron" placeholder="例如：0 9 * * * (每天9点)" required>
-                        <div class="cron-help">
-                            格式：秒 分 时 日 月 星期 | 
-                            <a href="https://www.bejson.com/othertools/cron/" target="_blank">Cron表达式生成器</a>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>提醒手机号</label>
-                        <div id="mobileNumbers">
-                            <div class="mobile-input">
-                                <input type="tel" placeholder="手机号" value="">
-                                <button type="button" onclick="removeMobile(this)" class="btn btn-danger">删除</button>
-                            </div>
-                        </div>
-                        <button type="button" onclick="addMobile()" class="btn" style="margin-top: 5px;">添加手机号</button>
-                    </div>
-
-                    <div class="form-group">
-                        <label>有效日期</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day0" value="0">
-                                <label for="day0">周日</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day1" value="1" checked>
-                                <label for="day1">周一</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day2" value="2" checked>
-                                <label for="day2">周二</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day3" value="3" checked>
-                                <label for="day3">周三</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day4" value="4" checked>
-                                <label for="day4">周四</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day5" value="5" checked>
-                                <label for="day5">周五</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="day6" value="6">
-                                <label for="day6">周六</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="botUrl">自己的企业微信群机器人链接</label>
-                        <textarea id="botUrl" placeholder="你自己的群机器人链接，如果不填，就使用本平台自己的群机器人，不在群的无法收到信息" rows="3" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn">
-                        创建任务
-                    </button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2 id="taskListTitle">任务列表</h2>
-                <div class="form-group">
-                    <label for="phoneSearch">按手机号搜索</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="phoneSearch" placeholder="输入完整的手机号搜索任务" style="flex: 1;">
-                        <button type="button" class="btn" onclick="searchTasks()">搜索</button>
-                    </div>
-                </div>
-                <div id="taskList" class="task-list">
-                    <div class="empty-state">
-                        <p>请输入手机号进行搜索</p>
-                        <p>点击搜索按钮查看相关任务</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container" id="main-container" style="display:none;">
+    <div class="header">
+      <h1>RoHS环保报告管控系统</h1>
+      <div>
+        <span id="user-info" style="margin-right:10px;color:#666;"></span>
+        <button class="btn btn-default" onclick="logout()">退出</button>
+      </div>
     </div>
 
-    <script>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-vendors">0</div>
+        <div class="stat-label">供应商</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-reports">0</div>
+        <div class="stat-label">主报告</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-wafer">0</div>
+        <div class="stat-label">Wafer报告</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-certs">0</div>
+        <div class="stat-label">体系证书</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-pending">0</div>
+        <div class="stat-label">待更新</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-expired">0</div>
+        <div class="stat-label">已超期</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-tasks">0</div>
+        <div class="stat-label">定时任务</div>
+      </div>
+    </div>
 
-        // 显示任务列表
-        function displayTasks(tasks) {
-            const taskList = document.getElementById('taskList');
-            const taskListTitle = document.getElementById('taskListTitle');
-            const searchKeyword = document.getElementById('phoneSearch')?.value || '';
-            
-            // 更新任务列表标题
-            if (searchKeyword) {
-                const taskCount = tasks.length;
-                taskListTitle.textContent = `任务列表(搜索到${taskCount}个)`;
-            } else {
-                taskListTitle.textContent = `任务列表`;
-            }
-            
-            if (!searchKeyword || tasks.length === 0) {
-                taskList.innerHTML = `
-                    <div class="empty-state">
-                        <p>${searchKeyword ? '未找到该手机号的任务' : '请输入手机号进行搜索'}</p>
-                        <p>${searchKeyword ? '请确认手机号是否正确' : '输入完整的手机号查看相关任务'}</p>
-                    </div>
-                `;
-                return;
-            }
+    <div class="nav">
+      <a href="#" class="active" onclick="showPage('dashboard')">仪表盘</a>
+      <a href="#" onclick="showPage('tasks')">任务管理</a>
+      <a href="#" onclick="showPage('reports')">报告管理</a>
+      <a href="#" onclick="showPage('vendors')">供应商管理</a>
+      <a href="#" onclick="showPage('certificates')">体系证书</a>
+      <a href="#" onclick="showPage('logs')">发送日志</a>
+      <a href="#" onclick="showPage('settings')">系统设置</a>
+      <a href="#" onclick="showPage('users')" id="nav-users">用户管理</a>
+    </div>
 
-            taskList.innerHTML = tasks.map(task => `
-                <div class="task-item">
-                    <h3>${task.name}</h3>
-                    <p><strong>内容:</strong> ${task.message}</p>
-                    <p><strong>时间:</strong> ${task.cron}</p>
-                    <p><strong>时间描述:</strong> ${task.cronDescription || '无描述'}</p>
-                    <p><strong>手机号:</strong> ${task.mobileNumbers.join(', ')}</p>
-                    <p><strong>有效日期:</strong> ${task.activeDaysText || formatActiveDays(task.activeDays)}</p>
-                    <p><strong>创建时间:</strong> ${task.createdAtFormatted || task.createdAt}</p>
-                    <p><strong>状态:</strong> ${task.isActive ? '运行中' : '未运行'}</p>
-                    <span class="task-status ${task.enabled ? 'enabled' : 'disabled'}">
-                        ${task.enabled ? '已启用' : '已禁用'}
-                    </span>
-                    <div class="task-actions">
-                        <button class="btn ${task.enabled ? 'btn-danger' : 'btn-success'}" 
-                                onclick="toggleTask('${task.id}', ${!task.enabled})">
-                            ${task.enabled ? '禁用' : '启用'}
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteTask('${task.id}')">删除</button>
-                    </div>
-                </div>
-            `).join('');
+    <!-- 仪表盘 -->
+    <div id="page-dashboard" class="page active">
+      <div class="card">
+        <h2>待更新报告（有效期≤15天）</h2>
+        <table>
+          <thead><tr><th>供应商</th><th>材料型号</th><th>材料类别</th><th>报告类型</th><th>到期日期</th><th>剩余天数</th></tr></thead>
+          <tbody id="pending-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>已超期报告</h2>
+        <table>
+          <thead><tr><th>供应商</th><th>材料型号</th><th>材料类别</th><th>报告类型</th><th>到期日期</th><th>超期天数</th></tr></thead>
+          <tbody id="expired-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 任务管理 -->
+    <div id="page-tasks" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <h2>定时任务</h2>
+          <div>
+            <button class="btn btn-success" onclick="triggerSelectedTasks()">批量触发</button>
+            <button class="btn btn-danger" onclick="batchDelete('tasks')">批量删除</button>
+            <button class="btn btn-primary" onclick="showTaskModal()">+ 新建任务</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th width="40"><input type="checkbox" id="check-all-tasks" onclick="toggleAll('tasks')"></th><th>ID</th><th>任务名称</th><th>提醒类型</th><th>Cron表达式</th><th>通知方式</th><th>最后运行</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="tasks-table"></tbody>
+        </table>
+        <div class="pagination" id="tasks-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 报告管理 -->
+    <div id="page-reports" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" class="search-input" placeholder="搜索材料型号..." onkeyup="filterReports(this.value)">
+            <select id="report-filter-category" onchange="filterReportsAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">材料类别</option>
+            </select>
+            <select id="report-filter-vendor" onchange="filterReportsAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">供应商</option>
+            </select>
+            <select id="report-filter-type" onchange="filterReportsAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">报告类型</option>
+            </select>
+            <select id="report-filter-testorg" onchange="filterReportsAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">测试机构</option>
+            </select>
+            <select id="report-sort" onchange="filterReportsAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="id">排序: 默认</option>
+              <option value="expiry_date">按到期日期</option>
+              <option value="valid_days">按有效天数</option>
+              <option value="report_date">按报告日期</option>
+              <option value="vendor">按供应商</option>
+              <option value="material_model">按材料型号</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-default" onclick="exportData('reports')">导出报告</button>
+            <button class="btn btn-default" onclick="exportData('wafer')">导出晶圆</button>
+            <button class="btn btn-danger" onclick="batchDelete('reports')">批量删除</button>
+            <button class="btn btn-primary" onclick="showReportModal()">+ 添加报告</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th width="40"><input type="checkbox" id="check-all-reports" onclick="toggleAll('reports')"></th><th>ID</th><th>材料型号</th><th>材料类别</th><th>供应商</th><th>报告类型</th><th>测试机构</th><th>报告编号</th><th>报告日期</th><th>到期日期</th><th>有效天数</th><th>操作</th></tr></thead>
+          <tbody id="reports-table"></tbody>
+        </table>
+        <div class="pagination" id="reports-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 供应商管理 -->
+    <div id="page-vendors" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <input type="text" class="search-input" placeholder="搜索供应商..." onkeyup="filterVendors(this.value)">
+          <div>
+            <button class="btn btn-default" onclick="exportData('vendors')">导出</button>
+            <button class="btn btn-danger" onclick="batchDelete('vendors')">批量删除</button>
+            <button class="btn btn-primary" onclick="showVendorModal()">+ 添加供应商</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th width="40"><input type="checkbox" id="check-all-vendors" onclick="toggleAll('vendors')"></th><th>ID</th><th>供应商名称</th><th>邮箱地址</th><th>抄送</th><th>手机号</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="vendors-table"></tbody>
+        </table>
+        <div class="pagination" id="vendors-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 体系证书管理 -->
+    <div id="page-certificates" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" class="search-input" placeholder="搜索组织名称..." onkeyup="filterCertificates(this.value)">
+            <select id="cert-filter-name" onchange="filterCertificatesAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">证书名称</option>
+            </select>
+            <input type="text" id="cert-filter-scope" onkeyup="filterCertificatesAll()" placeholder="认证范围" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;width:100px;">
+            <input type="text" id="cert-filter-authority" onkeyup="filterCertificatesAll()" placeholder="认证机构" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;width:100px;">
+            <select id="cert-filter-no" onchange="filterCertificatesAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="">证书编号</option>
+            </select>
+            <select id="cert-sort" onchange="filterCertificatesAll()" style="padding:6px;border:1px solid #d9d9d9;border-radius:4px;">
+              <option value="id">排序: 默认</option>
+              <option value="expiry_date">按到期日期</option>
+              <option value="valid_days">按有效天数</option>
+              <option value="organization_name">按组织名称</option>
+              <option value="certificate_name">按证书名称</option>
+            </select>
+          </div>
+          <div>
+            <button class="btn btn-default" onclick="exportData('certificates')">导出</button>
+            <button class="btn btn-danger" onclick="batchDelete('certificates')">批量删除</button>
+            <button class="btn btn-primary" onclick="showCertModal()">+ 添加证书</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th width="40"><input type="checkbox" id="check-all-certificates" onclick="toggleAll('certificates')"></th><th>ID</th><th>组织名称</th><th>证书名称</th><th>认证范围</th><th>认证机构</th><th>证书编号</th><th>到期日期</th><th>有效天数</th><th>操作</th></tr></thead>
+          <tbody id="certificates-table"></tbody>
+        </table>
+        <div class="pagination" id="certificates-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 发送日志 -->
+    <div id="page-logs" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <h2>发送日志</h2>
+          <button class="btn btn-default" onclick="loadLogs()">刷新</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>供应商</th><th>材料型号</th><th>消息类型</th><th>通知方式</th><th>状态</th><th>发送时间</th></tr></thead>
+          <tbody id="logs-table"></tbody>
+        </table>
+        <div class="pagination" id="logs-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 系统设置 -->
+    <div id="page-settings" class="page">
+      <div class="card">
+        <h2>环境变量配置</h2>
+        <div style="margin-bottom:15px;">
+          <button class="btn btn-success" onclick="showImportModal()">导入数据</button>
+        </div>
+        <table>
+          <thead><tr><th>变量名</th><th>说明</th><th>当前值</th><th>操作</th></tr></thead>
+          <tbody id="env-table">
+            <tr><td>WECHAT_WEBHOOK_KEY</td><td>企业微信机器人Key</td><td><input type="text" id="env-wechat-key" value="" style="width:200px;"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('WECHAT_WEBHOOK_KEY')">保存</button></td></tr>
+            <tr><td>SMTP_HOST</td><td>SMTP服务器</td><td><input type="text" id="env-smtp-host" value="smtp.qiye.aliyun.com" style="width:200px;"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('SMTP_HOST')">保存</button></td></tr>
+            <tr><td>SMTP_USER</td><td>SMTP用户名</td><td><input type="text" id="env-smtp-user" value="" style="width:200px;"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('SMTP_USER')">保存</button></td></tr>
+            <tr><td>SMTP_PASS</td><td>SMTP密码</td><td><input type="password" id="env-smtp-pass" value="" style="width:200px;" placeholder="留空不修改"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('SMTP_PASS')">保存</button></td></tr>
+            <tr><td>REMINDER_DAYS_THRESHOLD</td><td>提醒天数阈值</td><td><input type="number" id="env-threshold" value="15" style="width:100px;"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('REMINDER_DAYS_THRESHOLD')">保存</button></td></tr>
+            <tr><td>REPORT_VALID_DAYS</td><td>报告有效期(天)</td><td><input type="number" id="env-valid-days" value="364" style="width:100px;"></td><td><button class="btn btn-default btn-sm" onclick="saveEnv('REPORT_VALID_DAYS')">保存</button></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:15px;">
+          <button class="btn btn-primary" onclick="showTestWechat()">测试企业微信</button>
+          <button class="btn btn-primary" onclick="showTestEmail()">测试邮件</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <h2>日志清理设置</h2>
+        <div class="form-group">
+          <label>自动清理发送日志（超过指定天数）</label>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input type="number" id="log-clean-days" value="30" style="width:80px;padding:6px;border:1px solid #d9d9d9;border-radius:4px;" min="1">
+            <span>天</span>
+            <button class="btn btn-default" onclick="cleanLogsNow()">立即清理</button>
+            <button class="btn btn-primary" onclick="saveLogCleanSetting()">保存设置</button>
+          </div>
+        </div>
+        <div style="color:#999;font-size:12px;margin-top:5px;">
+          说明：每天凌晨执行自动清理，可设置1-365天
+        </div>
+      </div>
+    </div>
+
+    <!-- 用户管理 -->
+    <div id="page-users" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <h2>用户管理</h2>
+          <button class="btn btn-primary" onclick="showUserModal()">+ 添加用户</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>用户名</th><th>角色</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="users-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户弹窗 -->
+  <div id="user-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="user-modal-title">添加用户</div>
+      <input type="hidden" id="user-id">
+      <div class="form-group"><label>用户名 *</label><input type="text" id="user-name" placeholder="请输入用户名"></div>
+      <div class="form-group"><label>密码 *</label><input type="password" id="user-password" placeholder="请输入密码"></div>
+      <div class="form-group"><label>角色</label><select id="user-role"><option value="user">普通用户</option><option value="admin">管理员</option></select></div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('user-modal')">取消</button><button class="btn btn-primary" onclick="saveUser()">保存</button></div>
+    </div>
+  </div>
+
+  <!-- 任务弹窗 -->
+  <div id="task-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="task-modal-title">新建任务</div>
+      <input type="hidden" id="task-id">
+      <div class="form-group"><label>任务名称 *</label><input type="text" id="task-name" placeholder="如：每日环保报告提醒"></div>
+      <div class="form-group"><label>Cron表达式 *</label><input type="text" id="task-cron" value="0 9 * * *"><small style="color:#999;">格式：秒 分 时 日 月 周（如：0 9 * * * 表示每天9点）</small></div>
+      <div class="form-group"><label>提醒类型</label><select id="task-remind-type"><option value="报告">报告提醒</option><option value="体系证书">体系证书提醒</option></select></div>
+      <div class="form-group"><label>通知方式</label><select id="task-notify-type"><option value="wechat,email">企业微信+邮件</option><option value="wechat">仅企业微信</option><option value="email">仅邮件</option></select></div>
+      <div class="form-group"><label>有效日期（周几）</label><input type="text" id="task-active-days" value="[1,2,3,4,5]" placeholder="[1,2,3,4,5]"></div>
+      <div class="form-group"><label><input type="checkbox" id="task-enabled" checked> 启用任务</label></div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('task-modal')">取消</button><button class="btn btn-primary" onclick="saveTask()">保存</button></div>
+    </div>
+  </div>
+
+  <!-- 供应商弹窗 -->
+  <div id="vendor-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="vendor-modal-title">添加供应商</div>
+      <input type="hidden" id="vendor-id">
+      <div class="form-group"><label>供应商名称 *</label><input type="text" id="vendor-name" placeholder="如：ASY"></div>
+      <div class="form-group"><label>邮箱地址（多个用逗号分隔）</label><input type="text" id="vendor-email" placeholder="vendor@example.com, vendor2@example.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label>抄送（多个用逗号分隔）</label><input type="text" id="vendor-cc" placeholder="cc@example.com"></div>
+        <div class="form-group"><label>手机号（多个用逗号分隔，用于企业微信@）</label><input type="text" id="vendor-mobile" placeholder="13800138000"></div>
+      </div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('vendor-modal')">取消</button><button class="btn btn-primary" onclick="saveVendor()">保存</button></div>
+    </div>
+  </div>
+
+  <!-- 报告弹窗 -->
+  <div id="report-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="report-modal-title">添加报告</div>
+      <input type="hidden" id="report-id">
+      <input type="hidden" id="report-type" value="">
+      <div class="form-row">
+        <div class="form-group"><label>材料型号 *</label><input type="text" id="report-material-model" placeholder="如：MODEL-001"></div>
+        <div class="form-group"><label>材料类别</label><input type="text" id="report-material-category" placeholder="如：IC"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>供应商</label><input type="text" id="report-vendor" placeholder="如：ASY"></div>
+        <div class="form-group"><label>报告类型</label><input type="text" id="report-type-field" placeholder="如：ROHS"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>测试机构</label><input type="text" id="report-test-org" placeholder="如：SGS"></div>
+        <div class="form-group"><label>报告编号</label><input type="text" id="report-no" placeholder="如：R2024001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>报告日期</label><input type="date" id="report-date"></div>
+        <div class="form-group"><label>到期日期</label><input type="date" id="report-expiry-date"></div>
+      </div>
+      <div class="form-group"><label>有效天数</label><input type="number" id="report-valid-days" placeholder="自动计算或手动输入"></div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('report-modal')">取消</button><button class="btn btn-primary" onclick="saveReport()">保存</button></div>
+    </div>
+  </div>
+
+  <!-- 导入弹窗 -->
+  <div id="import-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title">导入数据</div>
+      <div class="form-group">
+        <label>数据来源</label>
+        <select id="import-source" onchange="toggleImportOptions()">
+          <option value="demo">加载Demo数据（推荐测试使用）</option>
+          <option value="upload">上传Excel文件导入</option>
+          <option value="excel">从服务器路径导入（需配置）</option>
+        </select>
+      </div>
+      <div id="upload-option" style="display:none;" class="form-group">
+        <label>选择Excel文件</label>
+        <input type="file" id="import-file" accept=".xlsx,.xls" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:4px;">
+      </div>
+      <div style="margin-top:15px;">
+        <button class="btn btn-default" onclick="downloadTemplate()">下载模板</button>
+      </div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('import-modal')">取消</button><button class="btn btn-primary" onclick="doImport()">导入</button></div>
+    </div>
+  </div>
+
+  <!-- 证书弹窗 -->
+  <div id="cert-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="cert-modal-title">添加证书</div>
+      <input type="hidden" id="cert-id">
+      <div class="form-row">
+        <div class="form-group"><label>组织名称 *</label><input type="text" id="cert-org-name" placeholder="如：XXX公司"></div>
+        <div class="form-group"><label>证书名称</label><input type="text" id="cert-name" placeholder="如：ISO9001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>认证/代理范围</label><input type="text" id="cert-scope" placeholder="如：汽车零部件"></div>
+        <div class="form-group"><label>认证/授权机构</label><input type="text" id="cert-authority" placeholder="如：SGS"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>证书编号</label><input type="text" id="cert-no" placeholder="如：CNAS XXX"></div>
+        <div class="form-group"><label>IATF证书编号</label><input type="text" id="cert-iatf-no" placeholder="如：IATF XXX"></div>
+      </div>
+      <div class="form-group"><label>组织认证地址</label><input type="text" id="cert-address" placeholder="如：XXX市XXX区"></div>
+      <div class="form-row">
+        <div class="form-group"><label>现行证书日期</label><input type="date" id="cert-date"></div>
+        <div class="form-group"><label>证书有效期限</label><input type="date" id="cert-expiry-date"></div>
+      </div>
+      <div class="form-group"><label>有效天数</label><input type="number" id="cert-valid-days" placeholder="自动计算或手动输入"></div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('cert-modal')">取消</button><button class="btn btn-primary" onclick="saveCert()">保存</button></div>
+    </div>
+  </div>
+
+  <!-- 测试弹窗 -->
+  <div id="test-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="test-modal-title">测试</div>
+      <input type="hidden" id="test-type">
+      <div class="form-group"><label>消息内容</label><textarea id="test-content" rows="4" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:4px;"></textarea></div>
+      <div class="form-group" id="test-mobile-group"><label>手机号（企业微信@人员）</label><input type="text" id="test-mobile" placeholder="13800138000"></div>
+      <div class="form-group" id="test-email-group" style="display:none;"><label>收件人邮箱</label><input type="text" id="test-email" placeholder="test@example.com"></div>
+      <div class="form-actions"><button class="btn btn-default" onclick="closeModal('test-modal')">取消</button><button class="btn btn-primary" onclick="doTest()">发送测试</button></div>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 'dashboard';
+    let allReports = [];
+    let allVendors = [];
+    let allTasks = [];
+    let allLogs = [];
+    let currentUser = null;
+    const tokenKey = 'rohs_token';
+    
+    const PAGE_SIZE = 20;
+    const paginator = {
+      tasks: { page: 1, total: 0 },
+      reports: { page: 1, total: 0 },
+      vendors: { page: 1, total: 0 },
+      certificates: { page: 1, total: 0 },
+      logs: { page: 1, total: 0 }
+    };
+
+    function getToken() { return localStorage.getItem(tokenKey); }
+    function setToken(t) { localStorage.setItem(tokenKey, t); }
+    function clearToken() { localStorage.removeItem(tokenKey); }
+
+    async function api(url, options = {}) {
+      const token = getToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
+      return res.json();
+    }
+
+    // ============ 登录 ============
+    async function doLogin() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      if (!username || !password) return alert('请输入用户名和密码');
+      
+      const res = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+      if (res.success) {
+        setToken(res.token);
+        currentUser = res.user;
+        document.getElementById('login-modal').classList.remove('show');
+        document.getElementById('main-container').style.display = 'block';
+        document.getElementById('user-info').textContent = res.user.username + '(' + res.user.role + ')';
+        document.getElementById('nav-users').style.display = res.user.role === 'admin' ? '' : 'none';
+        loadStats(); loadPendingReports();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function logout() {
+      clearToken();
+      currentUser = null;
+      document.getElementById('login-modal').classList.add('show');
+      document.getElementById('main-container').style.display = 'none';
+    }
+
+    // 检查登录状态
+    async function checkLogin() {
+      const token = getToken();
+      if (!token) return;
+      const res = await api('/api/auth/me');
+      if (res.success) {
+        currentUser = res.user;
+        document.getElementById('login-modal').classList.remove('show');
+        document.getElementById('main-container').style.display = 'block';
+        document.getElementById('user-info').textContent = res.user.username + '(' + res.user.role + ')';
+        document.getElementById('nav-users').style.display = res.user.role === 'admin' ? '' : 'none';
+        loadStats(); loadPendingReports();
+      } else {
+        clearToken();
+      }
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    // ============ 统计 ============
+    async function loadStats() {
+      const stats = await api('/api/stats');
+      if (stats.success) {
+        document.getElementById('stat-vendors').textContent = stats.data.vendors;
+        document.getElementById('stat-reports').textContent = stats.data.reports;
+        document.getElementById('stat-wafer').textContent = stats.data.waferReports;
+        document.getElementById('stat-certs').textContent = stats.data.certificates || 0;
+        document.getElementById('stat-pending').textContent = stats.data.pendingReminders;
+        document.getElementById('stat-expired').textContent = stats.data.expiredReports;
+        document.getElementById('stat-tasks').textContent = stats.data.tasks;
+      }
+    }
+
+    // ============ 页面导航 ============
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      event.target.classList.add('active');
+      currentPage = page;
+
+      if (page === 'dashboard') { loadStats(); loadPendingReports(); }
+      if (page === 'tasks') { loadTasks(); }
+      if (page === 'reports') { loadReports(); }
+      if (page === 'vendors') { loadVendors(); }
+      if (page === 'certificates') { loadCertificates(); }
+      if (page === 'logs') { loadLogs(); }
+      if (page === 'users') { loadUsers(); }
+      if (page === 'settings') { loadEnv(); }
+    }
+
+    async function loadEnv() {
+      const res = await api('/api/config');
+      if (res.success) {
+        const env = res.data;
+        document.getElementById('env-wechat-key').value = env.WECHAT_WEBHOOK_KEY || '';
+        document.getElementById('env-smtp-host').value = env.SMTP_HOST || 'smtp.qiye.aliyun.com';
+        document.getElementById('env-smtp-user').value = env.SMTP_USER || '';
+        document.getElementById('env-smtp-pass').value = '';
+        document.getElementById('env-threshold').value = env.REMINDER_DAYS_THRESHOLD || 15;
+        document.getElementById('env-valid-days').value = env.REPORT_VALID_DAYS || 364;
+        document.getElementById('log-clean-days').value = env.LOG_CLEAN_DAYS || 30;
+      }
+    }
+
+    // ============ 用户管理 ============
+    async function loadUsers() {
+      const users = await api('/api/users');
+      if (users.success) {
+        document.getElementById('users-table').innerHTML = users.data.map(u => `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.username}</td>
+            <td><span class="status-tag ${u.role === 'admin' ? 'status-danger' : 'status-normal'}">${u.role === 'admin' ? '管理员' : '普通用户'}</span></td>
+            <td>${u.created_at || '-'}</td>
+            <td>
+              <div class="actions">
+                ${(currentUser.role === 'admin' || u.role !== 'admin') ? `<button class="btn btn-default btn-sm" onclick="editUser(${u.id})">编辑</button>` : ''}
+                ${(currentUser.role === 'admin' && u.role !== 'admin') ? `<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">删除</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="5" class="empty">暂无用户</td></tr>';
+      }
+    }
+
+    function showUserModal(user = null) {
+      document.getElementById('user-modal-title').textContent = user ? '编辑用户' : '添加用户';
+      document.getElementById('user-id').value = user ? user.id : '';
+      document.getElementById('user-name').value = user ? user.username : '';
+      document.getElementById('user-password').value = '';
+      
+      const roleSelect = document.getElementById('user-role');
+      roleSelect.innerHTML = '<option value="user">普通用户</option><option value="admin">管理员</option>';
+      
+      if (user) {
+        roleSelect.value = user.role;
+        // 普通用户不能修改管理员角色
+        if (currentUser.role !== 'admin' || user.role === 'admin') {
+          roleSelect.disabled = true;
+        } else {
+          roleSelect.disabled = false;
         }
-
-        // 搜索任务
-        async function searchTasks() {
-            const phone = document.getElementById('phoneSearch').value.trim();
-            
-            if (!phone) {
-                displayTasks([]);
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/tasks?phone=${encodeURIComponent(phone)}`);
-                const data = await response.json();
-                displayTasks(data.data.tasks || data);
-            } catch (error) {
-                console.error('搜索任务失败:', error);
-                displayTasks([]);
-            }
+        // 普通用户不能编辑管理员
+        if (currentUser.role !== 'admin' && user.role === 'admin') {
+          document.getElementById('user-name').disabled = true;
+          document.getElementById('user-password').disabled = true;
+        } else {
+          document.getElementById('user-name').disabled = false;
+          document.getElementById('user-password').disabled = false;
         }
+      } else {
+        roleSelect.disabled = false;
+        document.getElementById('user-name').disabled = false;
+        document.getElementById('user-password').disabled = false;
+      }
+      
+      document.getElementById('user-modal').classList.add('show');
+    }
 
-        // 格式化有效日期
-        function formatActiveDays(days) {
-            if (!days || days.length === 0) return '每天';
-            if (days.length === 7) return '每天';
-            
-            const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-            return days.map(d => dayNames[d]).join(', ');
+    async function editUser(id) {
+      const users = await api('/api/users');
+      const user = users.success ? users.data.find(u => u.id === id) : null;
+      if (user) {
+        // 普通用户不能编辑管理员
+        if (currentUser.role !== 'admin' && user.role === 'admin') {
+          alert('您没有权限编辑管理员用户');
+          return;
         }
+        showUserModal(user);
+      }
+    }
 
-        // 添加手机号输入框
-        function addMobile() {
-            const container = document.getElementById('mobileNumbers');
-            const div = document.createElement('div');
-            div.className = 'mobile-input';
-            div.innerHTML = `
-                <input type="tel" placeholder="手机号" required>
-                <button type="button" onclick="removeMobile(this)" class="btn btn-danger">删除</button>
-            `;
-            container.appendChild(div);
-        }
+    async function saveUser() {
+      const id = document.getElementById('user-id').value;
+      const data = {
+        username: document.getElementById('user-name').value,
+        password: document.getElementById('user-password').value,
+        role: document.getElementById('user-role').value
+      };
+      if (!data.username || !data.password) return alert('请填写用户名和密码');
+      
+      let res;
+      if (id) {
+        res = await api('/api/users/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        res = await api('/api/auth/register', { method: 'POST', body: JSON.stringify(data) });
+      }
+      if (res.success) { closeModal('user-modal'); loadUsers(); } else alert('保存失败: ' + res.error);
+    }
 
-        // 删除手机号输入框
-        function removeMobile(button) {
-            const container = document.getElementById('mobileNumbers');
-            if (container.children.length > 1) {
-                button.parentElement.remove();
-            }
-        }
+    async function deleteUser(id) {
+      const users = await api('/api/users');
+      const user = users.success ? users.data.find(u => u.id === id) : null;
+      if (user && user.role === 'admin') {
+        alert('不能删除管理员用户');
+        return;
+      }
+      if (!confirm('确定删除该用户？')) return;
+      const res = await api('/api/users/' + id, { method: 'DELETE' });
+      if (res.success) loadUsers(); else alert(res.error);
+    }
 
-        // 创建任务
-        document.getElementById('taskForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('taskName').value;
-            const message = document.getElementById('taskMessage').value;
-            const cron = document.getElementById('taskCron').value;
-            
-            // 获取所有手机号
-            const mobileInputs = document.querySelectorAll('#mobileNumbers input');
-            const mobileNumbers = Array.from(mobileInputs)
-                .map(input => input.value.trim())
-                .filter(phone => phone);
-            
-            // 获取有效日期
-            const activeDays = [];
-            for (let i = 0; i <= 6; i++) {
-                const checkbox = document.getElementById(`day${i}`);
-                if (checkbox.checked) {
-                    activeDays.push(i);
-                }
-            }
+    // ============ 仪表盘 ============
+    async function loadPendingReports() {
+      const [reportsData, certsData] = await Promise.all([
+        api('/api/reports/remind'),
+        api('/api/certificates/remind')
+      ]);
+      
+      const allReports = [];
+      if (reportsData.success) {
+        allReports.push(...reportsData.data.reports);
+        allReports.push(...reportsData.data.waferReports || []);
+      }
+      if (certsData.success) {
+        allReports.push(...certsData.data);
+      }
+      
+      const pending = allReports.filter(r => r.valid_days >= 0);
+      const expired = allReports.filter(r => r.valid_days < 0);
+      
+      document.getElementById('pending-table').innerHTML = pending.slice(0, 50).map(r => `
+        <tr><td>${r.vendor || r.organization_name || '-'}</td><td>${r.material_model || r.certificate_name || '-'}</td><td>${r.material_category || r.certification_authority || '-'}</td><td>${r.report_type || r.certificate_no || '-'}</td><td>${r.expiry_date || '-'}</td><td><span class="status-tag status-warning">${r.valid_days}天</span></td></tr>
+      `).join('') || '<tr><td colspan="6" class="empty">无待更新报告</td></tr>';
 
-            const botUrl = document.getElementById('botUrl').value;
+      document.getElementById('expired-table').innerHTML = expired.slice(0, 50).map(r => `
+        <tr><td>${r.vendor || r.organization_name || '-'}</td><td>${r.material_model || r.certificate_name || '-'}</td><td>${r.material_category || r.certification_authority || '-'}</td><td>${r.report_type || r.certificate_no || '-'}</td><td>${r.expiry_date || '-'}</td><td><span class="status-tag status-danger">${Math.abs(r.valid_days)}天</span></td></tr>
+      `).join('') || '<tr><td colspan="6" class="empty">无超期报告</td></tr>';
+    }
 
-            const taskData = {
-                name,
-                message,
-                cron,
-                mobileNumbers,
-                activeDays,
-                botUrl,
-                enabled: true
-            };
+    // ============ 任务管理 ============
+    async function loadTasks(page = 1) {
+      paginator.tasks.page = page;
+      const tasks = await api('/api/tasks');
+      if (tasks.success) {
+        allTasks = tasks.data;
+        paginator.tasks.total = Math.ceil(allTasks.length / PAGE_SIZE);
+        const start = (page - 1) * PAGE_SIZE;
+        const paged = allTasks.slice(start, start + PAGE_SIZE);
+        document.getElementById('tasks-table').innerHTML = paged.map(t => `
+          <tr>
+            <td><input type="checkbox" class="check-item" data-id="${t.id}" data-type="tasks"></td>
+            <td>${t.id}</td>
+            <td>${t.name}</td>
+            <td>${t.remind_type === '体系证书' ? '体系证书' : '报告'}</td>
+            <td><code>${t.cron}</code></td>
+            <td>${t.notify_type}</td>
+            <td>${t.last_run || '-'}</td>
+            <td><span class="status-tag ${t.enabled ? 'status-normal' : 'status-danger'}">${t.enabled ? '已启用' : '已禁用'}</span></td>
+            <td>
+              <div class="actions">
+                <button class="btn btn-default btn-sm" onclick="editTask(${t.id})">编辑</button>
+                <button class="btn btn-default btn-sm" onclick="triggerSingleTask(${t.id})">触发</button>
+                <button class="btn btn-default btn-sm" onclick="toggleTask(${t.id}, ${t.enabled ? 0 : 1})">${t.enabled ? '禁用' : '启用'}</button>
+              </div>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="9" class="empty">暂无任务</td></tr>';
+        renderPagination('tasks');
+      }
+    }
 
-            try {
-                const response = await fetch('/api/tasks', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(taskData)
-                });
+    function renderPagination(type) {
+      const p = paginator[type];
+      if (!p.total || p.total <= 1) {
+        document.getElementById(type + '-pagination').innerHTML = '';
+        return;
+      }
+      let html = `<button class="btn btn-default btn-sm" onclick="load${capitalize(type)}(${p.page - 1})" ${p.page === 1 ? 'disabled' : ''}>上一页</button>`;
+      for (let i = 1; i <= p.total; i++) {
+        html += `<button class="btn btn-sm ${i === p.page ? 'btn-primary' : 'btn-default'}" onclick="load${capitalize(type)}(${i})">${i}</button>`;
+      }
+      html += `<button class="btn btn-default btn-sm" onclick="load${capitalize(type)}(${p.page + 1})" ${p.page === p.total ? 'disabled' : ''}>下一页</button>`;
+      document.getElementById(type + '-pagination').innerHTML = html;
+    }
 
-                if (response.ok) {
-                    document.getElementById('taskForm').reset();
-                    loadTasks();
-                    alert('任务创建成功！记得把想要提醒的Ta加入到群聊哦~');
-                } else {
-                    const error = await response.json();
-                    alert('创建失败: ' + error.error);
-                }
-            } catch (error) {
-                console.error('创建任务失败:', error);
-                alert('创建任务失败，请重试');
-            }
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    function showTaskModal(task = null) {
+      document.getElementById('task-modal-title').textContent = task ? '编辑任务' : '新建任务';
+      document.getElementById('task-id').value = task ? task.id : '';
+      document.getElementById('task-name').value = task ? task.name : '';
+      document.getElementById('task-cron').value = task ? task.cron : '0 9 * * *';
+      document.getElementById('task-remind-type').value = task && task.remind_type ? task.remind_type : '报告';
+      document.getElementById('task-notify-type').value = task ? task.notify_type : 'wechat,email';
+      document.getElementById('task-active-days').value = task ? task.active_days : '[1,2,3,4,5]';
+      document.getElementById('task-enabled').checked = task ? task.enabled : true;
+      document.getElementById('task-modal').classList.add('show');
+    }
+
+    async function editTask(id) {
+      const tasks = await api('/api/tasks');
+      const task = tasks.data.find(t => t.id === id);
+      if (task) showTaskModal(task);
+    }
+
+    async function triggerSingleTask(id) {
+      if (!confirm('确定触发该任务？')) return;
+      const res = await api('/api/tasks/' + id + '/trigger', { method: 'POST' });
+      alert(res.success ? '任务已触发！' : '触发失败: ' + res.error);
+    }
+
+    async function saveTask() {
+      const id = document.getElementById('task-id').value;
+      const data = {
+        name: document.getElementById('task-name').value,
+        cron: document.getElementById('task-cron').value,
+        remind_type: document.getElementById('task-remind-type').value,
+        notify_type: document.getElementById('task-notify-type').value,
+        active_days: document.getElementById('task-active-days').value,
+        enabled: document.getElementById('task-enabled').checked ? 1 : 0
+      };
+      if (!data.name || !data.cron) return alert('请填写任务名称和Cron表达式');
+      
+      let res;
+      if (id) {
+        res = await api('/api/tasks/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        res = await api('/api/tasks', { method: 'POST', body: JSON.stringify(data) });
+      }
+      if (res.success) { closeModal('task-modal'); loadTasks(); loadStats(); } else alert('保存失败: ' + res.error);
+    }
+
+    async function toggleTask(id, enabled) {
+      await api('/api/tasks/' + id, { method: 'PUT', body: JSON.stringify({ enabled }) });
+      loadTasks(); loadStats();
+    }
+
+    async function deleteTask(id) {
+      if (!confirm('确定删除该任务？')) return;
+      await api('/api/tasks/' + id, { method: 'DELETE' });
+      loadTasks(); loadStats();
+    }
+
+    // ============ 报告管理 ============
+    async function loadReports(page = 1) {
+      paginator.reports.page = page;
+      const [main, wafer] = await Promise.all([api('/api/reports'), api('/api/reports?type=wafer')]);
+      allReports = [
+        ...(main.success ? main.data.map(r => ({...r, reportType: 'main'})) : []),
+        ...(wafer.success ? wafer.data.map(r => ({...r, reportType: 'wafer'})) : [])
+      ];
+      paginator.reports.total = Math.ceil(allReports.length / PAGE_SIZE);
+      const start = (page - 1) * PAGE_SIZE;
+      const paged = allReports.slice(start, start + PAGE_SIZE);
+      renderReports(paged);
+      renderPagination('reports');
+      initReportFilters();
+    }
+
+    function renderReports(reports) {
+      document.getElementById('reports-table').innerHTML = reports.map(r => `
+        <tr>
+          <td><input type="checkbox" class="check-item" data-id="${r.id}" data-type="${r.reportType}"></td>
+          <td>${r.id}</td>
+          <td>${r.material_model}</td>
+          <td>${r.material_category || '-'}</td>
+          <td>${r.vendor || '-'}</td>
+          <td>${r.report_type || '-'}</td>
+          <td>${r.test_org || '-'}</td>
+          <td>${r.report_no || '-'}</td>
+          <td>${r.report_date || '-'}</td>
+          <td>${r.expiry_date || '-'}</td>
+          <td><span class="status-tag ${r.valid_days < 0 ? 'status-danger' : r.valid_days <= 15 ? 'status-warning' : 'status-normal'}">${r.valid_days}天</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-default btn-sm" onclick="editReport(${r.id}, '${r.reportType}')">编辑</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="12" class="empty">暂无报告</td></tr>';
+    }
+
+    function filterReports(keyword) {
+      document.getElementById('report-filter-category').value = '';
+      document.getElementById('report-filter-vendor').value = '';
+      document.getElementById('report-filter-type').value = '';
+      document.getElementById('report-filter-testorg').value = '';
+      filterReportsAll();
+    }
+
+    function filterReportsAll() {
+      const searchKw = document.querySelector('#page-reports .search-input').value.toLowerCase().trim();
+      const categoryFilter = document.getElementById('report-filter-category').value;
+      const vendorFilter = document.getElementById('report-filter-vendor').value;
+      const typeFilter = document.getElementById('report-filter-type').value;
+      const testOrgFilter = document.getElementById('report-filter-testorg').value;
+      const sortBy = document.getElementById('report-sort').value;
+
+      let filtered = allReports.filter(r => {
+        if (searchKw && !r.material_model.toLowerCase().includes(searchKw) &&
+            !(r.vendor && r.vendor.toLowerCase().includes(searchKw)) &&
+            !(r.material_category && r.material_category.toLowerCase().includes(searchKw)) &&
+            !(r.report_no && r.report_no.toLowerCase().includes(searchKw))) return false;
+        if (categoryFilter && r.material_category !== categoryFilter) return false;
+        if (vendorFilter && r.vendor !== vendorFilter) return false;
+        if (typeFilter && r.report_type !== typeFilter) return false;
+        if (testOrgFilter && r.test_org !== testOrgFilter) return false;
+        return true;
+      });
+
+      if (sortBy === 'expiry_date') {
+        filtered.sort((a, b) => (a.expiry_date || '').localeCompare(b.expiry_date || ''));
+      } else if (sortBy === 'valid_days') {
+        filtered.sort((a, b) => (a.valid_days || 0) - (b.valid_days || 0));
+      } else if (sortBy === 'report_date') {
+        filtered.sort((a, b) => (a.report_date || '').localeCompare(b.report_date || ''));
+      } else if (sortBy === 'vendor') {
+        filtered.sort((a, b) => (a.vendor || '').localeCompare(b.vendor || ''));
+      } else if (sortBy === 'material_model') {
+        filtered.sort((a, b) => (a.material_model || '').localeCompare(b.material_model || ''));
+      } else {
+        filtered.sort((a, b) => b.id - a.id);
+      }
+
+      paginator.reports.page = 1;
+      paginator.reports.total = Math.ceil(filtered.length / PAGE_SIZE);
+      const start = 0;
+      const paged = filtered.slice(start, start + PAGE_SIZE);
+      renderReports(paged);
+      renderPagination('reports');
+    }
+
+    function initReportFilters() {
+      const categories = [...new Set(allReports.filter(r => r.material_category).map(r => r.material_category))];
+      const vendors = [...new Set(allReports.filter(r => r.vendor).map(r => r.vendor))];
+      const types = [...new Set(allReports.filter(r => r.report_type).map(r => r.report_type))];
+      const testOrgs = [...new Set(allReports.filter(r => r.test_org).map(r => r.test_org))];
+
+      const categorySel = document.getElementById('report-filter-category');
+      categorySel.innerHTML = '<option value="">材料类别</option>' + categories.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+      
+      const vendorSel = document.getElementById('report-filter-vendor');
+      vendorSel.innerHTML = '<option value="">供应商</option>' + vendors.map(v => '<option value="' + v + '">' + v + '</option>').join('');
+      
+      const typeSel = document.getElementById('report-filter-type');
+      typeSel.innerHTML = '<option value="">报告类型</option>' + types.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+      
+      const testOrgSel = document.getElementById('report-filter-testorg');
+      testOrgSel.innerHTML = '<option value="">测试机构</option>' + testOrgs.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+    }
+
+    function showReportModal(report = null, type = 'main') {
+      document.getElementById('report-modal-title').textContent = report ? '编辑报告' : '添加报告';
+      document.getElementById('report-id').value = report ? report.id : '';
+      document.getElementById('report-type').value = type;
+      document.getElementById('report-material-model').value = report ? report.material_model : '';
+      document.getElementById('report-material-category').value = report ? report.material_category : '';
+      document.getElementById('report-vendor').value = report ? report.vendor : '';
+      document.getElementById('report-type-field').value = report ? report.report_type : '';
+      document.getElementById('report-test-org').value = report ? report.test_org : '';
+      document.getElementById('report-no').value = report ? report.report_no : '';
+      document.getElementById('report-date').value = report ? report.report_date : '';
+      document.getElementById('report-expiry-date').value = report ? report.expiry_date : '';
+      document.getElementById('report-valid-days').value = report ? report.valid_days : '';
+      document.getElementById('report-modal').classList.add('show');
+    }
+
+    async function editReport(id, type) {
+      const res = await api('/api/reports' + (type === 'wafer' ? '?type=wafer' : ''));
+      const report = res.success ? res.data.find(r => r.id === id) : null;
+      if (report) showReportModal(report, type);
+    }
+
+    async function saveReport() {
+      const id = document.getElementById('report-id').value;
+      const type = document.getElementById('report-type').value;
+      const data = {
+        type: type,
+        material_model: document.getElementById('report-material-model').value,
+        material_category: document.getElementById('report-material-category').value,
+        vendor: document.getElementById('report-vendor').value,
+        report_type: document.getElementById('report-type-field').value,
+        test_org: document.getElementById('report-test-org').value,
+        report_no: document.getElementById('report-no').value,
+        report_date: document.getElementById('report-date').value,
+        expiry_date: document.getElementById('report-expiry-date').value,
+        valid_days: parseInt(document.getElementById('report-valid-days').value) || 0
+      };
+      if (!data.material_model) return alert('请填写材料型号');
+      
+      let res;
+      if (id) {
+        res = await api('/api/reports/' + id + '?type=' + type, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        res = await api('/api/reports', { method: 'POST', body: JSON.stringify(data) });
+      }
+      if (res.success) { closeModal('report-modal'); loadReports(); loadStats(); } else alert('保存失败: ' + res.error);
+    }
+
+    async function deleteReport(id, type) {
+      if (!confirm('确定删除该报告？')) return;
+      await api('/api/reports/' + id + '?type=' + type, { method: 'DELETE' });
+      loadReports(); loadStats();
+    }
+
+    // ============ 供应商管理 ============
+    async function loadVendors(page = 1) {
+      paginator.vendors.page = page;
+      const vendors = await api('/api/vendors');
+      if (vendors.success) {
+        allVendors = vendors.data;
+        paginator.vendors.total = Math.ceil(allVendors.length / PAGE_SIZE);
+        const start = (page - 1) * PAGE_SIZE;
+        const paged = allVendors.slice(start, start + PAGE_SIZE);
+        renderVendors(paged);
+        renderPagination('vendors');
+      }
+    }
+
+    function renderVendors(vendors) {
+      document.getElementById('vendors-table').innerHTML = vendors.map(v => `
+        <tr>
+          <td><input type="checkbox" class="check-item" data-id="${v.id}" data-type="vendor"></td>
+          <td>${v.id}</td>
+          <td>${v.name}</td>
+          <td>${v.email || '-'}</td>
+          <td>${v.cc || '-'}</td>
+          <td>${v.mobile || '-'}</td>
+          <td>${v.created_at || '-'}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-default btn-sm" onclick="editVendor(${v.id})">编辑</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="8" class="empty">暂无供应商</td></tr>';
+    }
+
+    function filterVendors(keyword) {
+      const filtered = allVendors.filter(v => v.name.toLowerCase().includes(keyword.toLowerCase()));
+      const start = 0;
+      const paged = filtered.slice(start, start + PAGE_SIZE);
+      paginator.vendors.page = 1;
+      paginator.vendors.total = Math.ceil(filtered.length / PAGE_SIZE);
+      renderVendors(paged);
+      renderPagination('vendors');
+    }
+
+    function showVendorModal(vendor = null) {
+      document.getElementById('vendor-modal-title').textContent = vendor ? '编辑供应商' : '添加供应商';
+      document.getElementById('vendor-id').value = vendor ? vendor.id : '';
+      document.getElementById('vendor-name').value = vendor ? vendor.name : '';
+      document.getElementById('vendor-email').value = vendor ? vendor.email : '';
+      document.getElementById('vendor-cc').value = vendor ? vendor.cc : '';
+      document.getElementById('vendor-mobile').value = vendor ? vendor.mobile : '';
+      document.getElementById('vendor-modal').classList.add('show');
+    }
+
+    async function editVendor(id) {
+      const vendors = await api('/api/vendors');
+      const vendor = vendors.success ? vendors.data.find(v => v.id === id) : null;
+      if (vendor) showVendorModal(vendor);
+    }
+
+    async function saveVendor() {
+      const id = document.getElementById('vendor-id').value;
+      const data = {
+        name: document.getElementById('vendor-name').value,
+        email: document.getElementById('vendor-email').value,
+        cc: document.getElementById('vendor-cc').value,
+        mobile: document.getElementById('vendor-mobile').value
+      };
+      if (!data.name) return alert('请填写供应商名称');
+      
+      let res;
+      if (id) {
+        res = await api('/api/vendors/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        res = await api('/api/vendors', { method: 'POST', body: JSON.stringify(data) });
+      }
+      if (res.success) { closeModal('vendor-modal'); loadVendors(); loadStats(); } else alert('保存失败: ' + res.error);
+    }
+
+    async function deleteVendor(id) {
+      if (!confirm('确定删除该供应商？')) return;
+      await api('/api/vendors/' + id, { method: 'DELETE' });
+      loadVendors(); loadStats();
+    }
+
+    // ============ 体系证书管理 ============
+    let allCertificates = [];
+
+    async function loadCertificates(page = 1) {
+      paginator.certificates.page = page;
+      const certs = await api('/api/certificates');
+      if (certs.success) {
+        allCertificates = certs.data;
+        paginator.certificates.total = Math.ceil(allCertificates.length / PAGE_SIZE);
+        const start = (page - 1) * PAGE_SIZE;
+        const paged = allCertificates.slice(start, start + PAGE_SIZE);
+        renderCertificates(paged);
+        renderPagination('certificates');
+        initCertFilters();
+      }
+    }
+
+    function renderCertificates(certs) {
+      document.getElementById('certificates-table').innerHTML = certs.map(c => `
+        <tr>
+          <td><input type="checkbox" class="check-item" data-id="${c.id}" data-type="cert"></td>
+          <td>${c.id}</td>
+          <td>${c.organization_name || '-'}</td>
+          <td>${c.certificate_name || '-'}</td>
+          <td>${c.certification_scope || '-'}</td>
+          <td>${c.certification_authority || '-'}</td>
+          <td>${c.certificate_no || '-'}</td>
+          <td>${c.expiry_date || '-'}</td>
+          <td><span class="status-tag ${c.valid_days < 0 ? 'status-danger' : c.valid_days <= 15 ? 'status-warning' : 'status-normal'}">${c.valid_days}天</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-default btn-sm" onclick="editCert(${c.id})">编辑</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="10" class="empty">暂无证书</td></tr>';
+    }
+
+    function filterCertificates(keyword) {
+      document.getElementById('cert-filter-name').value = '';
+      document.getElementById('cert-filter-scope').value = '';
+      document.getElementById('cert-filter-authority').value = '';
+      document.getElementById('cert-filter-no').value = '';
+      filterCertificatesAll();
+    }
+
+    function filterCertificatesAll() {
+      const searchKw = document.querySelector('#page-certificates .search-input').value.toLowerCase().trim();
+      const nameFilter = document.getElementById('cert-filter-name').value;
+      const scopeFilter = document.getElementById('cert-filter-scope').value.toLowerCase().trim();
+      const authorityFilter = document.getElementById('cert-filter-authority').value.toLowerCase().trim();
+      const noFilter = document.getElementById('cert-filter-no').value;
+      const sortBy = document.getElementById('cert-sort').value;
+
+      let filtered = allCertificates.filter(c => {
+        if (searchKw && !c.organization_name.toLowerCase().includes(searchKw) &&
+            !(c.certificate_name && c.certificate_name.toLowerCase().includes(searchKw)) &&
+            !(c.certification_authority && c.certification_authority.toLowerCase().includes(searchKw))) return false;
+        if (nameFilter && c.certificate_name !== nameFilter) return false;
+        if (scopeFilter && !(c.certification_scope && c.certification_scope.toLowerCase().includes(scopeFilter))) return false;
+        if (authorityFilter && !(c.certification_authority && c.certification_authority.toLowerCase().includes(authorityFilter))) return false;
+        if (noFilter && c.certificate_no !== noFilter) return false;
+        return true;
+      });
+
+      if (sortBy === 'expiry_date') {
+        filtered.sort((a, b) => (a.expiry_date || '').localeCompare(b.expiry_date || ''));
+      } else if (sortBy === 'valid_days') {
+        filtered.sort((a, b) => (a.valid_days || 0) - (b.valid_days || 0));
+      } else if (sortBy === 'organization_name') {
+        filtered.sort((a, b) => (a.organization_name || '').localeCompare(b.organization_name || ''));
+      } else if (sortBy === 'certificate_name') {
+        filtered.sort((a, b) => (a.certificate_name || '').localeCompare(b.certificate_name || ''));
+      } else {
+        filtered.sort((a, b) => b.id - a.id);
+      }
+
+      paginator.certificates.page = 1;
+      paginator.certificates.total = Math.ceil(filtered.length / PAGE_SIZE);
+      const start = 0;
+      const paged = filtered.slice(start, start + PAGE_SIZE);
+      renderCertificates(paged);
+      renderPagination('certificates');
+    }
+
+    function initCertFilters() {
+      const names = [...new Set(allCertificates.filter(c => c.certificate_name).map(c => c.certificate_name))];
+      const nos = [...new Set(allCertificates.filter(c => c.certificate_no).map(c => c.certificate_no))];
+
+      const nameSel = document.getElementById('cert-filter-name');
+      nameSel.innerHTML = '<option value="">证书名称</option>' + names.map(n => '<option value="' + n + '">' + n + '</option>').join('');
+      
+      const noSel = document.getElementById('cert-filter-no');
+      noSel.innerHTML = '<option value="">证书编号</option>' + nos.map(n => '<option value="' + n + '">' + n + '</option>').join('');
+    }
+
+    function showCertModal(cert = null) {
+      document.getElementById('cert-modal-title').textContent = cert ? '编辑证书' : '添加证书';
+      document.getElementById('cert-id').value = cert ? cert.id : '';
+      document.getElementById('cert-org-name').value = cert ? cert.organization_name : '';
+      document.getElementById('cert-name').value = cert ? cert.certificate_name : '';
+      document.getElementById('cert-scope').value = cert ? cert.certification_scope : '';
+      document.getElementById('cert-authority').value = cert ? cert.certification_authority : '';
+      document.getElementById('cert-no').value = cert ? cert.certificate_no : '';
+      document.getElementById('cert-iatf-no').value = cert ? cert.iatf_certificate_no : '';
+      document.getElementById('cert-address').value = cert ? cert.organization_address : '';
+      document.getElementById('cert-date').value = cert ? cert.certificate_date : '';
+      document.getElementById('cert-expiry-date').value = cert ? cert.expiry_date : '';
+      document.getElementById('cert-valid-days').value = cert ? cert.valid_days : '';
+      document.getElementById('cert-modal').classList.add('show');
+    }
+
+    async function editCert(id) {
+      const certs = await api('/api/certificates');
+      const cert = certs.success ? certs.data.find(c => c.id === id) : null;
+      if (cert) showCertModal(cert);
+    }
+
+    async function saveCert() {
+      const id = document.getElementById('cert-id').value;
+      const data = {
+        organization_name: document.getElementById('cert-org-name').value,
+        certificate_name: document.getElementById('cert-name').value,
+        certification_scope: document.getElementById('cert-scope').value,
+        certification_authority: document.getElementById('cert-authority').value,
+        certificate_no: document.getElementById('cert-no').value,
+        iatf_certificate_no: document.getElementById('cert-iatf-no').value,
+        organization_address: document.getElementById('cert-address').value,
+        certificate_date: document.getElementById('cert-date').value,
+        expiry_date: document.getElementById('cert-expiry-date').value,
+        valid_days: parseInt(document.getElementById('cert-valid-days').value) || 0
+      };
+      if (!data.organization_name) return alert('请填写组织名称');
+      
+      let res;
+      if (id) {
+        res = await api('/api/certificates/' + id, { method: 'PUT', body: JSON.stringify(data) });
+      } else {
+        res = await api('/api/certificates', { method: 'POST', body: JSON.stringify(data) });
+      }
+      if (res.success) { closeModal('cert-modal'); loadCertificates(); } else alert('保存失败: ' + res.error);
+    }
+
+    // ============ 日志 ============
+    async function loadLogs(page = 1) {
+      paginator.logs.page = page;
+      const logs = await api('/api/logs?limit=1000');
+      if (logs.success) {
+        allLogs = logs.data;
+        paginator.logs.total = Math.ceil(allLogs.length / PAGE_SIZE);
+        const start = (page - 1) * PAGE_SIZE;
+        const paged = allLogs.slice(start, start + PAGE_SIZE);
+        document.getElementById('logs-table').innerHTML = paged.map(l => `
+          <tr>
+            <td>${l.id}</td>
+            <td>${l.vendor || '-'}</td>
+            <td>${l.material_model || '-'}</td>
+            <td>${l.message_type || '-'}</td>
+            <td>${l.notify_type || '-'}</td>
+            <td><span class="status-tag ${l.status === 'sent' ? 'status-normal' : 'status-danger'}">${l.status}</span></td>
+            <td>${l.sent_at || '-'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="7" class="empty">暂无日志</td></tr>';
+        renderPagination('logs');
+      }
+    }
+
+    // ============ 导入 ============
+    function showImportModal() { 
+      document.getElementById('import-modal').classList.add('show'); 
+      toggleImportOptions();
+    }
+    
+    function toggleImportOptions() {
+      const source = document.getElementById('import-source').value;
+      document.getElementById('upload-option').style.display = source === 'upload' ? 'block' : 'none';
+    }
+    
+    async function downloadTemplate() {
+      window.open('/api/import/template', '_blank');
+    }
+    
+    function exportData(type) {
+      window.open('/api/export?type=' + type, '_blank');
+    }
+    
+    async function doImport() {
+      const source = document.getElementById('import-source').value;
+      let res;
+      
+      if (source === 'demo') {
+        res = await api('/api/import/demo', { method: 'POST' });
+      } else if (source === 'upload') {
+        const fileInput = document.getElementById('import-file');
+        if (!fileInput.files.length) return alert('请选择文件');
+        
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        
+        res = await fetch('/api/import/upload', {
+          method: 'POST',
+          body: formData
         });
+        res = await res.json();
+      } else {
+        res = await api('/api/import', { method: 'POST', body: JSON.stringify({}) });
+      }
+      
+      if (res.success) { alert('导入成功！'); closeModal('import-modal'); loadStats(); if (currentPage === 'reports') loadReports(); if (currentPage === 'vendors') loadVendors(); if (currentPage === 'certificates') loadCertificates(); }
+      else alert('导入失败: ' + res.error);
+    }
 
-        // 切换任务状态
-        async function toggleTask(id, enabled) {
-            try {
-                const response = await fetch(`/api/tasks/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ enabled })
-                });
+    // ============ 测试 ============
+    function showTestWechat() {
+      document.getElementById('test-modal-title').textContent = '测试企业微信';
+      document.getElementById('test-type').value = 'wechat';
+      document.getElementById('test-content').value = '这是一条测试消息';
+      document.getElementById('test-mobile-group').style.display = 'block';
+      document.getElementById('test-email-group').style.display = 'none';
+      document.getElementById('test-modal').classList.add('show');
+    }
 
-                if (response.ok) {
-                    loadTasks();
-                }
-            } catch (error) {
-                console.error('切换任务状态失败:', error);
-            }
+    function showTestEmail() {
+      document.getElementById('test-modal-title').textContent = '测试邮件';
+      document.getElementById('test-type').value = 'email';
+      document.getElementById('test-content').value = '这是一封测试邮件';
+      document.getElementById('test-mobile-group').style.display = 'none';
+      document.getElementById('test-email-group').style.display = 'block';
+      document.getElementById('test-modal').classList.add('show');
+    }
+
+    async function doTest() {
+      const type = document.getElementById('test-type').value;
+      const content = document.getElementById('test-content').value;
+      let res;
+      if (type === 'wechat') {
+        const mobileList = document.getElementById('test-mobile').value.split(',').map(m => m.trim());
+        res = await api('/api/test/wechat', { method: 'POST', body: JSON.stringify({ content, mobileList }) });
+      } else {
+        const to = document.getElementById('test-email').value;
+        const subject = 'RoHS系统测试邮件';
+        res = await api('/api/test/email', { method: 'POST', body: JSON.stringify({ to, subject, content }) });
+      }
+      alert(res.success ? '发送成功！' : '发送失败: ' + res.error);
+      if (res.success) closeModal('test-modal');
+    }
+
+    async function triggerSelectedTasks() {
+      const selected = getSelectedIds('tasks');
+      if (!selected.length) return alert('请选择要触发的任务');
+      if (!confirm('确定触发选中的 ' + selected.length + ' 个任务？')) return;
+      
+      const taskIds = selected.map(item => item.id);
+      const res = await api('/api/tasks/trigger-batch', { 
+        method: 'POST', 
+        body: JSON.stringify({ taskIds }) 
+      });
+      alert(res.success ? res.message : '触发失败: ' + res.error);
+    }
+
+    async function saveEnv(key) {
+      const value = document.getElementById('env-' + key.toLowerCase()).value;
+      const res = await api('/api/config', { method: 'POST', body: JSON.stringify({ key, value }) });
+      alert(res.success ? '保存成功，请重启服务生效' : '保存失败: ' + res.error);
+    }
+
+    async function cleanLogsNow() {
+      const days = parseInt(document.getElementById('log-clean-days').value) || 30;
+      if (!confirm('确定清理 ' + days + ' 天前的发送日志？')) return;
+      const res = await api('/api/logs/clean', { method: 'POST', body: JSON.stringify({ days }) });
+      alert(res.success ? '已清理 ' + res.deleted + ' 条日志' : '清理失败: ' + res.error);
+      loadLogs();
+    }
+
+    async function saveLogCleanSetting() {
+      const days = parseInt(document.getElementById('log-clean-days').value) || 30;
+      const res = await api('/api/config', { method: 'POST', body: JSON.stringify({ key: 'LOG_CLEAN_DAYS', value: days }) });
+      alert(res.success ? '设置已保存' : '保存失败: ' + res.error);
+    }
+
+    function toggleAll(type) {
+      const master = document.getElementById('check-all-' + type);
+      if (!master) return;
+      const checked = master.checked;
+      document.querySelectorAll('#' + type + '-table .check-item').forEach(cb => {
+        cb.checked = checked;
+      });
+    }
+
+    function getSelectedIds(type) {
+      const checkboxes = document.querySelectorAll('#' + type + '-table .check-item:checked');
+      return Array.from(checkboxes).map(cb => ({ id: parseInt(cb.dataset.id), subType: cb.dataset.type }));
+    }
+
+    async function batchDelete(type) {
+      const selected = getSelectedIds(type);
+      if (!selected.length) return alert('请选择要删除的项');
+      if (!confirm('确定删除选中的 ' + selected.length + ' 项？')) return;
+      
+      if (type === 'tasks') {
+        for (const item of selected) await api('/api/tasks/' + item.id, { method: 'DELETE' });
+        loadTasks();
+      } else if (type === 'reports') {
+        for (const item of selected) {
+          const subType = item.subType || 'main';
+          await api('/api/reports/' + item.id + '?type=' + subType, { method: 'DELETE' });
         }
+        loadReports();
+      } else if (type === 'vendors') {
+        for (const item of selected) await api('/api/vendors/' + item.id, { method: 'DELETE' });
+        loadVendors();
+      } else if (type === 'certificates') {
+        for (const item of selected) await api('/api/certificates/' + item.id, { method: 'DELETE' });
+        loadCertificates();
+      }
+      loadStats();
+    }
 
-        // 删除任务
-        async function deleteTask(id) {
-            if (!confirm('确定要删除这个任务吗？')) return;
-            
-            try {
-                const response = await fetch(`/api/tasks/${id}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    loadTasks();
-                }
-            } catch (error) {
-                console.error('删除任务失败:', error);
-            }
-        }
-
-        // 加载任务列表（用于刷新）
-        async function loadTasks() {
-            const phone = document.getElementById('phoneSearch').value.trim();
-            if (phone) {
-                await searchTasks();
-            } else {
-                displayTasks([]);
-            }
-        }
-
-    </script>
+    // 初始化
+    checkLogin();
+  </script>
+<center></div>代码参考https://github.com/xintianyou/weixin-notify-reminder</div></center>
 </body>
 </html>
